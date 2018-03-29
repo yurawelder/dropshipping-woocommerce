@@ -822,6 +822,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
 
         // return if any child order is not completed
         $all_complete = true;
+        $all_refunded = true;
 
         if ( $sub_order_ids ) {
             foreach ($sub_order_ids as $sub_id ) {
@@ -834,6 +835,9 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                 if ( $order_status != 'completed' ) {
                     $all_complete = false;
                 }
+                if ( $order_status != 'refunded' ) {
+                    $all_refunded = false;
+                }
             }
         }
 
@@ -842,6 +846,12 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         if ( $all_complete ) {
             $parent_order = new WC_Order( $parent_order_id );
             $parent_order->update_status( 'wc-completed', __( 'Mark main order completed when all suborders are completed.', 'dropshipping-woocommerce' ) );
+        }
+
+        // mark the parent order as refunded
+        if ( $all_refunded ) {
+            $parent_order = new WC_Order( $parent_order_id );
+            $parent_order->update_status( 'wc-refunded', __( 'Mark main order refunded when all suborders are refunded.', 'dropshipping-woocommerce' ) );
         }
     }
 
@@ -853,7 +863,11 @@ class Knawat_Dropshipping_Woocommerce_Orders {
      */
     public function knawat_dropshipwc_admin_order_reports_remove_suborders( $query ) {
 
-        $query['where'] .= ' AND posts.post_parent = 0';
+        if( false !== strpos( $query['where'], 'shop_order_refund' ) && false !== strpos( $query['where'], 'parent' ) ){
+            $query['where'] .= ' AND parent.post_parent = 0';
+        }else{
+            $query['where'] .= ' AND posts.post_parent = 0';
+        }
 
         return $query;
     }
