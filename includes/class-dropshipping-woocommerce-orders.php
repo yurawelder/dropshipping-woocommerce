@@ -61,6 +61,14 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         /* Override customer orders' query */
         add_filter( 'woocommerce_my_account_my_orders_query', array( $this, 'knawat_dropshipwc_get_customer_main_orders' ) );
 
+        /* Rest API only list Main orders */
+        add_filter( 'woocommerce_rest_shop_order_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
+        add_filter( 'woocommerce_rest_shop_order_object_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
+
+        /* Add suborders' ID in REST API order response */
+        add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
+        add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
+
         /* Disabled Emails for suborders */
         $email_ids = array(
             'new_order',
@@ -183,8 +191,6 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             $product_ids = array();
             $items_tax = array();
 
-            do_action( 'woocommerce_new_order', $order_id );
-
             // now insert line items
             foreach ( $order_items as $item ) {
                 $order_total   += (float) $item->get_total();
@@ -291,6 +297,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                 update_post_meta( $order_id , '_knawat_order', 1 );
             }
 
+            do_action( 'woocommerce_new_order', $order_id );
             do_action( 'knawat_dropshipwc_checkout_update_order_meta', $order_id, $order_type );
         } // if order
     }
@@ -972,6 +979,55 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         $customer_orders['post_parent'] = 0;
         return $customer_orders;
     }
+
+    /**
+     * Override Customer Orders array
+     *
+     * @param $args args query for list orders
+     * @param $request WP REST API Request
+     *
+     * @return array modified orders args query
+     */
+    public function knawat_dropshipwc_rest_shop_order_query( $args, $request ){
+        $method = $request->get_method();
+        $route = $request->get_route();
+        if( 'GET' === $method && in_array( $route, array( '/wc/v1/orders', '/wc/v2/orders' ) ) ){
+            if( !empty( $args ) ){
+                if( empty( $args['post_parent__in'] ) ){
+                    $args['post_parent__in'] = array( 0 );
+                }
+            }
+        }
+        return $args;
+    }
+
+    /**
+	 * Add 'suborders' to the REST API.
+	 *
+	 * @since    1.2.0
+	 *
+	 * @param \WP_REST_Response $response The response object.
+	 * @param \WP_Post $post Post object.
+	 * @param \WP_REST_Request $request Request object.
+	 * @return object updated response object
+	 */
+	function knawat_dropshipwc_add_suborders_api( $response, $post, $request ){
+
+		if( empty( $response->data ) ){
+			return $response;
+		}
+
+        $suborder_ids = array();
+        if( 0 == $post->get_parent_id() ){
+            $suborder_ids = $this->knawat_dropshipwc_get_suborder( $post->get_id() );
+        }
+
+        if( !empty( $suborder_ids ) ){
+            $response->data['suborders'] = $suborder_ids;
+        }
+
+		return $response;
+	}
 }
 
 $knawat_dropshipwc_orders = new Knawat_Dropshipping_Woocommerce_Orders();
