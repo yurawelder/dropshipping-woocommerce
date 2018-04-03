@@ -58,7 +58,9 @@ class Knawat_Dropshipping_Woocommerce{
 			self::$instance->includes();
 			self::$instance->common = new Knawat_Dropshipping_Woocommerce_Common();
 			self::$instance->admin = new Knawat_Dropshipping_Woocommerce_Admin();
-
+			if( self::$instance->is_woocommerce_activated() ){
+				self::$instance->orders = new Knawat_Dropshipping_Woocommerce_Orders();
+			}
 			/**
 			* The code that runs during plugin activation.
 			*/
@@ -152,6 +154,7 @@ class Knawat_Dropshipping_Woocommerce{
 		if( $this->is_woocommerce_activated() ){
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-shipment-tracking.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-orders.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-admin-dashboard.php';
 		}
 		/**
 		 * Recommended and required plugins.

@@ -83,7 +83,30 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         foreach( $email_ids as $email_id ){
             add_filter( 'woocommerce_email_enabled_' . $email_id, array( $this, 'knawat_dropshipwc_disable_emails' ),10, 2 );
         }
-    }   
+
+        /**
+         *  Manaage Knawat Cost related in order meta and in order item meta.
+         */
+        // save knawat cost value when edited
+		add_action( 'woocommerce_saved_order_items', array( $this, 'save_order_item_cost' ), 10, 2 );
+
+        // update line item knawat cost totals and order knawat cost total when editing an order in the admin
+        add_action( 'woocommerce_process_shop_order_meta', array( $this, 'process_order_knawat_cost_meta' ), 15 );
+
+        // add line item knawat costs when line items are added in the admin via AJAX
+        add_action( 'woocommerce_ajax_add_order_item_meta', array( $this, 'ajax_add_order_line_knawat_cost' ), 10, 2 );
+
+        // set the order meta when an order is placed from standard checkout
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'set_order_knawat_cost_meta' ), 10, 1 );
+
+		// Order Create/update by API
+		add_action( 'woocommerce_new_order', array( $this, 'set_order_knawat_cost_meta' ), 10, 1 );
+        add_action( 'woocommerce_update_order', array( $this, 'set_order_knawat_cost_meta' ), 10, 1 );
+
+        // add negative cost of good item meta for refunds
+		add_action( 'woocommerce_refund_created', array( $this, 'add_refund_order_knawat_costs' ), 10, 2 );
+
+    }
 
     /**
      * Monitors a new order and attempts to create sub-orders
@@ -518,7 +541,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
 	 * Hide cost of goods meta data fields from the order admin
 	 */
 	public function knawat_dropshipwc_hide_order_item_meta( $hidden_fields ) {
-		return array_merge( $hidden_fields, array( '_package_type' ) );
+		return array_merge( $hidden_fields, array( '_package_type', '_knawat_item_cost', '_knawat_item_total_cost' ) );
     }
     
     /**
@@ -887,7 +910,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
      * @return Array $query Altered Array 
      */
     public function knawat_dropshipwc_dashboard_status_widget_top_seller_query( $query ){
-        $query['where']  .= "AND posts.post_parent = 0";
+        $query['where']  .= " AND posts.post_parent = 0 ";
         return $query;
     }
 
@@ -1027,7 +1050,158 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         }
 
 		return $response;
-	}
-}
+    }
 
-$knawat_dropshipwc_orders = new Knawat_Dropshipping_Woocommerce_Orders();
+
+    /**
+	 * Save order item knawat cost data over editing order items over Ajax
+	 *
+	 * @since 1.2.0
+	 * @param int $order_id order ID
+	 * @param array $items line item data
+	 */
+	public function save_order_item_cost( $order_id, $items ) {
+
+        $order = wc_get_order( $order_id );
+        if( !empty( $order ) ){
+            $this->update_knawat_cost_meta_for_order( $order );
+        }
+    }
+
+    /**
+	 * Update knawat cost meta data for orders and order items.
+	 *
+	 * @since 1.2.0
+	 * @param object $order order
+	 */
+	public function update_knawat_cost_meta_for_order( $order ) {
+        $items = $order->get_items();
+		if( empty( $items ) ) { return; }
+		$order_total_cost = 0;
+		foreach ( $items as $item ) {
+
+			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$product_id = $item->get_variation_id();
+				if( empty( $product_id ) || $product_id == 0 ){
+					$product_id = $item->get_product_id();
+				}
+				$knawat_cost = get_post_meta( $product_id, '_knawat_cost', true );
+				$item_id = $item->get_id();
+				$item_quantity = $item->get_quantity();
+				$total_cost = $knawat_cost * $item_quantity;
+
+				$order_total_cost += $total_cost;
+
+				if( $knawat_cost > 0 && $item_id > 0 ){
+					wc_update_order_item_meta( $item_id, '_knawat_item_cost', wc_format_decimal( $knawat_cost, 4 ) );
+					wc_update_order_item_meta( $item_id, '_knawat_item_total_cost', wc_format_decimal( $total_cost, 4 ) );
+				}
+			}
+        }
+        // update the order total cost
+		update_post_meta( $order->get_id(), '_knawat_order_total_cost', wc_format_decimal( $order_total_cost, wc_get_price_decimals() ) );
+    }
+
+    /**
+	 * Update the order line item knawat cost totals and the order knawat cost total when editing
+	 * an order in the admin.
+	 *
+	 * @since 1.2.0
+	 * @param int $post_id the post ID for the order
+	 */
+	public function process_order_knawat_cost_meta( $post_id ) {
+
+		// nonce check
+		if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( $_POST['woocommerce_meta_nonce'], 'woocommerce_save_data' ) ) {
+			return;
+		}
+
+        $order = wc_get_order( $post_id );
+        if( !empty( $order ) ){
+            $this->update_knawat_cost_meta_for_order( $order );
+        }
+	}
+
+
+	/**
+	 * Update the line item cost and cost total when items are added in the admin edit order page via AJAX
+	 *
+	 */
+	public function ajax_add_order_line_knawat_cost( $item_id, $item ) {
+
+        if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			$product_id = $item->get_variation_id();
+			if( empty( $product_id ) || $product_id == 0 ){
+				$product_id = $item->get_product_id();
+			}
+			$knawat_cost = get_post_meta( $product_id, '_knawat_cost', true );
+			if( $knawat_cost > 0 && $item_id > 0 ){
+				wc_update_order_item_meta( $item_id, '_knawat_item_cost', wc_format_decimal( $knawat_cost, 4 ) );
+				wc_update_order_item_meta( $item_id, '_knawat_item_total_cost', wc_format_decimal( $knawat_cost, 4 ) );
+			}
+		}
+    }
+
+    /**
+	 * Set the knawat cost meta for a given order.
+	 *
+	 * @param int $order_id The order ID.
+	 */
+	public function set_order_knawat_cost_meta( $order_id ) {
+        $order = wc_get_order( $order_id );
+        if( !empty( $order ) ){
+            $this->update_knawat_cost_meta_for_order( $order );
+        }
+	}
+
+    /**
+	 * Add order knawat costs to a refund meta and refund item meta
+     *
+     * @param int $refund_id Refund Id.
+	 */
+	public function add_refund_order_knawat_costs( $refund_id, $args ) {
+
+		$refund = wc_get_order( $refund_id );
+        $refund_total_cost = 0;
+        $order = wc_get_order( $args['order_id'] );
+        if( $order ){
+            $is_knawat_order = get_post_meta( $args['order_id'], '_knawat_order', true );
+            if( '1' == $is_knawat_order ){
+                update_post_meta( $refund_id, '_knawat_order', '1' );
+            }
+        }
+
+        foreach ( $refund->get_items() as $refund_line_item_id => $refund_line_item ) {
+
+            $item_id = $refund_line_item->get_id();
+            $total = $refund_line_item->get_total();
+            $qty = $refund_line_item->get_quantity();
+            $refunded_item_id = wc_get_order_item_meta( $item_id, '_refunded_item_id', true );
+
+            if( $total >= 0 || $qty ==  0 || empty( $refunded_item_id ) ){
+                continue;
+            }
+
+			// get original item cost
+			$item_cost = wc_get_order_item_meta( $refunded_item_id, '_knawat_item_cost', true );
+
+			if ( ! $item_cost ) {
+				continue;
+			}
+
+			// a refunded item cost & item total cost are negative since they reduce the item total costs when summed (for reports, etc)
+			$refunded_item_cost       = $item_cost * -1;
+			$refunded_item_total_cost = ( $item_cost * abs( $qty ) ) * -1;
+
+			// add as meta to the refund line item
+			wc_update_order_item_meta( $item_id, '_knawat_item_cost',       wc_format_decimal( $refunded_item_cost ) );
+			wc_update_order_item_meta( $item_id, '_knawat_item_total_cost', wc_format_decimal( $refunded_item_total_cost ) );
+
+			$refund_total_cost += $refunded_item_total_cost;
+		}
+
+		// update the refund total cost
+		update_post_meta( $refund->get_id(), '_knawat_order_total_cost', wc_format_decimal( $refund_total_cost, wc_get_price_decimals() ) );
+	}
+
+}
