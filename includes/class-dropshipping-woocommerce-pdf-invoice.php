@@ -37,6 +37,8 @@ class Knawat_Dropshipping_Woocommerce_PDF_Invoice {
 			$action 	= base64_decode( $knawat_action[0] );
 			$order_id 	= base64_decode( $knawat_action[1] );
 			$order_key	= base64_decode( $knawat_action[2] );
+			$mode = isset( $_GET['mode'] ) ? trim($_GET['mode']) : 'ltr';
+			$is_pdf = isset( $_GET['pdf'] ) ? trim($_GET['pdf']) : 0;
 			
 			if( $action != 'knawat_pdf_invoice' ){
 				return;
@@ -69,7 +71,21 @@ class Knawat_Dropshipping_Woocommerce_PDF_Invoice {
 						if ( has_action( 'wpo_wcpdf_created_manually' ) ) {
 							do_action( 'wpo_wcpdf_created_manually', $document->get_pdf(), $document->get_filename() );
 						}
-						$document->output_pdf( 'inline' );
+
+						if( '1' === $is_pdf ){
+							$document->output_pdf( 'inline' );
+						}else{
+							if( 'rtl' === $mode ){
+								//Render invoice RTL
+								?>
+								<style>
+									table, .invoice{ direction: rtl !important; }
+									th, td { text-align: right !important; }
+								</style>
+								<?php
+							}
+							$document->output_html();
+						}
 
 					} else {
 						wp_die( __( "Invoice for the selected order(s) could not be generated", 'dropshipping-woocommerce' ) );
@@ -99,7 +115,9 @@ class Knawat_Dropshipping_Woocommerce_PDF_Invoice {
 		}
         
 		$pdf_invoice_url = get_site_url() . '/?knawat_action=' . base64_encode( 'knawat_pdf_invoice' ) . '-' . base64_encode( $response->data['id'] ) . '-' . base64_encode( $response->data['order_key'] );
+		$pdf_invoice_url_rtl = $pdf_invoice_url . '&mode=rtl';
 		$response->data['pdf_invoice_url'] = $pdf_invoice_url;
+		$response->data['pdf_invoice_url_rtl'] = $pdf_invoice_url_rtl;
 
 		return $response;
 	}
