@@ -3,7 +3,7 @@
  * Plugin Name:       Knawat WooCommerce DropShipping
  * Plugin URI:        https://wordpress.org/plugins/dropshipping-woocommerce/
  * Description:       Knawat WooCommerce DropShipping
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Knawat Team
  * Author URI:        https://github.com/Knawat
  * License:           GPL-2.0+
@@ -83,14 +83,14 @@ class Knawat_Dropshipping_Woocommerce{
 	 *
 	 * @since 1.0.0
 	 */
-	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.0.0' ); }
+	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.1.0' ); }
 
 	/**
 	 * A dummy magic method to prevent Knawat_Dropshipping_Woocommerce from being unserialized.
 	 *
 	 * @since 1.0.0
 	 */
-	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.0.0' ); }
+	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.1.0' ); }
 
 
 	/**
@@ -104,7 +104,7 @@ class Knawat_Dropshipping_Woocommerce{
 
 		// Plugin version.
 		if( ! defined( 'KNAWAT_DROPWC_VERSION' ) ){
-			define( 'KNAWAT_DROPWC_VERSION', '1.0.0' );
+			define( 'KNAWAT_DROPWC_VERSION', '1.1.0' );
 		}
 
 		// Plugin folder Path.

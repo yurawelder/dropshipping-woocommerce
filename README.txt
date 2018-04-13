@@ -4,7 +4,7 @@ Tags: dropshipping, woocommerce, woocommerce dropshipping, dropship, woo dropshi
 Requires PHP: 5.3
 Requires at least: 4.0
 Tested up to: 4.9
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,13 @@ Knawat WooCommerce DropShipping allows you to Add products to your WooCommerce s
 4. Locate "Knawat WooCommerce DropShipping" in the list and click the "Activate" link.
 
 == Changelog ==
+
+= 1.1.0 =
+* ADDED: Filter option for Knawat Products and Orders
+* ADDED: Knawat Order Status
+* ADDED: Shipping Tracking Information in Order
+* IMPROVEMENT: Some Improvements
+* FIXED: some bug fixes.
 
 = 1.0.0 =
 * Initial Version.
