@@ -227,6 +227,30 @@ class Knawat_Dropshipping_Woocommerce{
 	}
 
 	/**
+	 * Get Defined DropShippers.
+	 *
+	 * @access public
+	 * @since 1.2.0
+	 * @return array
+	 */
+	public function get_dropshippers() {
+		$dropshippers = array(
+			'default' => array(
+				'id' 		=> 'default',
+				'name' 		=> 'Knawat Dropshipping',
+				'counties' 	=> 0
+			),
+			'knawat_saudi' => array(
+				'id' 		=> 'knawat_saudi',
+				'name' 		=> 'Saudi Knawat Dropshipping',
+				'counties' 	=> array( 'SA' )
+			),
+		);
+
+		return $dropshippers;
+	}
+
+	/**
 	 * enqueue script front-end
 	 * 
 	 * @access public
