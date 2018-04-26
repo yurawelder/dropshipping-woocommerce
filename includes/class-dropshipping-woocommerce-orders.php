@@ -142,8 +142,13 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             $temp = array_keys( $order_types );
             $order_type = reset( $temp );
             
-            if( 'knawat' === $order_type ){
+            $dropshippers = knawat_dropshipwc_get_dropshippers();
+            if( 'knawat' === $order_type || isset( $dropshippers[$order_type ] ) ){
                 update_post_meta( $parent_order_id , '_knawat_order', 1 );
+                if( isset( $dropshippers[$order_type ] ) ){
+                    update_post_meta( $parent_order_id , '_knawat_order_ds', $order_type );
+                    $this->knawat_dropshipwc_reduce_localds_stock( $parent_order_id, $order_type );
+                }
             }
             return;
         }
@@ -176,6 +181,25 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                 $product_id = $item->get_product_id();
                 $dropshipping = get_post_meta( $product_id, 'dropshipping', true );
                 if( $dropshipping == 'knawat' ){
+                    $variation_id = isset( $item['variation_id'] ) ? $item['variation_id'] : $item['product_id'];
+                    // get Dropshipper for variation.
+                    $dropshipper = get_post_meta( $variation_id, '_knawat_dropshipper', true );
+                    if( !empty( $dropshipper ) && $dropshipper != 'default' ){
+                        // Get Available Dropshippers
+                        $dropshippers = knawat_dropshipwc_get_dropshippers();
+
+                        if( isset( $dropshippers[$dropshipper] ) ){
+                            // Get Local DS's Country
+                            $countries = $dropshippers[$dropshipper]['countries'];
+                            // Get Order Country.
+                            $ship_country = $order->get_shipping_country();
+                            if( in_array( $ship_country,  $countries ) ){
+                                $items[$dropshipper][] = $item;
+                                continue;
+                            }
+                        }
+                    }
+
                     $items['knawat'][] = $item;
                 }else{
                     $items['non_knawat'][] = $item;
@@ -268,16 +292,6 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                     'order_item_type' => 'tax'
                 ) );
 
-                /* $ship_tax = 0;
-                $splited_shipping = $splited_order->get_items( 'shipping' );
-                if( !empty( $splited_shipping ) ){
-                    foreach( $splited_shipping as $splited_ship ){
-                        $taxes = $splited_ship->get_taxes();
-                        $temptax = isset( $taxes['total'][$tax->get_rate_id()] ) ? $taxes['total'][$tax->get_rate_id()] : 0;
-                        $ship_tax += $temptax;
-                    }
-                } */
-
                 $tax_metas = array(
                     'rate_id'             => $tax->get_rate_id(),
                     'label'               => $tax->get_label(),
@@ -316,8 +330,13 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             update_post_meta( $order_id, '_customer_ip_address',    get_post_meta( $parent_order->get_id(), '_customer_ip_address', true ) );
             update_post_meta( $order_id, '_customer_user_agent',    get_post_meta( $parent_order->get_id(), '_customer_user_agent', true ) );
             
-            if( 'knawat' === $order_type ){
+            $dropshippers = knawat_dropshipwc_get_dropshippers();
+            if( 'knawat' === $order_type || isset( $dropshippers[$order_type ] ) ){
                 update_post_meta( $order_id , '_knawat_order', 1 );
+                if( isset( $dropshippers[$order_type ] ) ){
+                    update_post_meta( $order_id , '_knawat_order_ds', $order_type );
+                    $this->knawat_dropshipwc_reduce_localds_stock( $order_id, $order_type );
+                }
             }
 
             do_action( 'woocommerce_new_order', $order_id );
@@ -362,7 +381,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             foreach( $ship_meta_data as $ship_meta ){
                 $ship_meta = $ship_meta->get_data();
                 if( isset( $ship_meta['key'] ) && '_package_type' === $ship_meta['key'] ){
-                    $package_type = 'knawat';
+                    $package_type = sanitize_text_field( $ship_meta['value'] );
                 }
             }
             if( $order_type != $package_type ){
@@ -466,12 +485,32 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         $packages              = array();
         $regular_package_items = array();
         $split_package_items   = array();
+        $localds_package_items = array();
 
         // Split these products in a separate package
         foreach ( WC()->cart->get_cart() as $item_key => $item ) {
             if ( $item['data']->needs_shipping() ) {
                 $dropshipping = get_post_meta( $item['product_id'], 'dropshipping', true );
                 if ( 'knawat' === $dropshipping ) {
+                    $variation_id = isset( $item['variation_id'] ) ? $item['variation_id'] : $item['product_id'];
+
+                    // get Dropshipper for variation.
+                    $dropshipper = get_post_meta( $variation_id, '_knawat_dropshipper', true );
+                    if( !empty( $dropshipper ) && $dropshipper != 'default' ){
+                        // Get Available Dropshippers
+                        $dropshippers = knawat_dropshipwc_get_dropshippers();
+
+                        if( isset( $dropshippers[$dropshipper] ) ){
+                            // Get Local DS's Country
+                            $countries = $dropshippers[$dropshipper]['countries'];
+                            // Get Shipping Country.
+                            $ship_country = WC()->customer->get_shipping_country();
+                            if( in_array( $ship_country,  $countries ) ){
+                                $localds_package_items[$dropshipper][ $item_key ] = $item;
+                                continue;
+                            }
+                        }
+                    }
                     $split_package_items[ $item_key ] = $item;
                 } else {
                     $regular_package_items[ $item_key ] = $item;
@@ -519,6 +558,27 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             );
         }
 
+        if ( !empty( $localds_package_items ) ) {
+            foreach ($localds_package_items as $dropship => $localds_package_item ) {
+                $packages[] = array(
+                    'contents'        => $localds_package_item,
+                    'contents_cost'   => array_sum( wp_list_pluck( $localds_package_item, 'line_total' ) ),
+                    'applied_coupons' => WC()->cart->get_applied_coupons(),
+                    'user'            => array(
+                        'ID' => get_current_user_id(),
+                    ),
+                    'package_type' => $dropship,
+                    'destination'    => array(
+                        'country'    => WC()->customer->get_shipping_country(),
+                        'state'      => WC()->customer->get_shipping_state(),
+                        'postcode'   => WC()->customer->get_shipping_postcode(),
+                        'city'       => WC()->customer->get_shipping_city(),
+                        'address'    => WC()->customer->get_shipping_address(),
+                        'address_2'  => WC()->customer->get_shipping_address_2()
+                    )
+                );
+            }
+        }
         return $packages;
     }
     
@@ -532,8 +592,8 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             return;
         }
 
-        if( isset( $package['package_type'] ) && 'knawat' === $package['package_type'] ){
-            $item->add_meta_data( '_package_type', 'knawat', true );
+        if( isset( $package['package_type'] ) && $package['package_type'] != '' ){
+            $item->add_meta_data( '_package_type', sanitize_text_field( $package['package_type'] ), true );
         }
     }
 
@@ -1204,4 +1264,40 @@ class Knawat_Dropshipping_Woocommerce_Orders {
 		update_post_meta( $refund->get_id(), '_knawat_order_total_cost', wc_format_decimal( $refund_total_cost, wc_get_price_decimals() ) );
 	}
 
+     /**
+     * Reduct local_ds stock.
+     *
+     * @param int $order_id
+     * @param int $dropshipper
+     */
+    function knawat_dropshipwc_reduce_localds_stock( $order_id, $dropshipper ) {
+
+        $order       = new WC_Order( $order_id );
+        if( empty( $order ) ){ return; }
+        $order_items = $order->get_items();
+
+        foreach ( $order_items as $item ) {
+            if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+                $variation_id = $item->get_variation_id();
+                if( empty( $variation_id ) ){
+                    $variation_id = $item->get_product_id();
+                }
+
+                $product_dropshipper = get_post_meta( $variation_id, '_knawat_dropshipper', true );
+                if( $product_dropshipper == $dropshipper ){
+                    $product_stock = get_post_meta( $variation_id, '_localds_stock', true );
+                    $item_qty = $item->get_quantity();
+                    if( $item_qty > 0 ){
+                        update_post_meta( $variation_id, '_localds_stock', ( $product_stock - $item_qty ) );
+                        // Add Stock Reduce note.
+                        $item_name    = $item->get_name();
+                        $dropshippers = knawat_dropshipwc_get_dropshippers();
+                        $dropshipper_name = $dropshippers[$dropshipper]['name'];
+                        $note         = sprintf( __( '%1$s stock reduced for "%2$s" from %3$s to %4$s.', 'woocommerce' ), $item_name, $dropshipper_name, $product_stock, ( $product_stock - $item_qty ) );
+                        $order->add_order_note( $note );
+                    }
+                }
+            }
+        }
+    }
 }
