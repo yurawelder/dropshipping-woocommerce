@@ -798,13 +798,20 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         global $post;
         $is_parentorder = $this->knawat_dropshipwc_get_suborder( absint( $post->ID ) );
         $is_suborder  = wp_get_post_parent_id( absint( $post->ID ) );
-    
+        $is_localds = get_post_meta( $post->ID, '_knawat_order_ds', true );
+
         if ( $is_parentorder ) {
             add_meta_box( 'knawat_dropshipwc-suborders', __( 'Suborders', 'dropshipping-woocommerce' ), array( $this, 'knawat_dropshipwc_render_order_metabox' ), 'shop_order', 'side', 'high' );
         } else if ( $is_suborder ) {
             add_meta_box( 'knawat_dropshipwc-parent-order',  __( 'Parent order', 'dropshipping-woocommerce' ), array( $this, 'knawat_dropshipwc_render_order_metabox' ), 'shop_order', 'side', 'high' );
         }
 
+        if( $is_localds != '' ){
+            $dropshippers = knawat_dropshipwc_get_dropshippers();
+            if( isset( $dropshippers[$is_localds] ) ){
+                add_meta_box( 'knawat_dropshipwc-order-ds',  __( 'Knawat Dropshipper', 'dropshipping-woocommerce' ), array( $this, 'knawat_dropshipwc_render_order_dropshipper_metabox' ), 'shop_order', 'side', 'high' );
+            }
+        }
     }
 
     /**
@@ -850,6 +857,23 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                 printf( '<a href="%s">&#8592; %s (#%s)</a>', $parent_order_uri, __( 'Return to main order', 'dropshipping-woocommerce' ), $parent_order_id );
                 break;
            
+        }
+    }
+
+    /**
+     * Render the order Dropshipper metaboxes
+     *
+     * @param $post     The post object
+     * @param $param    Callback args
+     *
+     * @return void
+     */
+    public function knawat_dropshipwc_render_order_dropshipper_metabox( $post, $args ) {
+        $is_localds = get_post_meta( $post->ID, '_knawat_order_ds', true );
+        $dropshippers = knawat_dropshipwc_get_dropshippers();
+        if( isset( $dropshippers[$is_localds] ) ){
+            $dropshipper_name = $dropshippers[$is_localds]['name'];
+            echo '<p><strong>'.$dropshipper_name.'</strong></p>';
         }
     }
 
