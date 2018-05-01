@@ -24,7 +24,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         // Create separate shipping packages for knawat and non-knawat products.
         add_filter( 'woocommerce_cart_shipping_packages', array( $this, 'knawat_dropshipwc_split_knawat_shipping_packages' ) );
         // Add item meta into shipping item.
-        add_action( 'woocommerce_checkout_create_order_shipping_item', array( $this, 'knawat_dropshipwc_add_shipping_meta_data' ), 10, 4 );
+        add_action( 'woocommerce_checkout_create_order_shipping_item', array( $this, 'knawat_dropshipwc_add_shipping_meta_data' ), 20, 4 );
 
         // hide the item meta on the Order Items table
         add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'knawat_dropshipwc_hide_order_item_meta' ) );
@@ -187,15 +187,78 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                     if( !empty( $dropshipper ) && $dropshipper != 'default' ){
                         // Get Available Dropshippers
                         $dropshippers = knawat_dropshipwc_get_dropshippers();
+                        $dropship_qty = get_post_meta( $variation_id, '_localds_stock', true );
+                        if( empty( $dropship_qty ) ){ $dropship_qty = 0; }
 
-                        if( isset( $dropshippers[$dropshipper] ) ){
+                        if( isset( $dropshippers[$dropshipper] ) && $dropship_qty > 0 ){
                             // Get Local DS's Country
                             $countries = $dropshippers[$dropshipper]['countries'];
                             // Get Order Country.
                             $ship_country = $order->get_shipping_country();
                             if( in_array( $ship_country,  $countries ) ){
-                                $items[$dropshipper][] = $item;
-                                continue;
+
+                                $qty = $item->get_quantity('edit');
+                                if( $qty <= $dropship_qty ){
+                                    $items[$dropshipper][] = $item;
+                                    continue;
+                                }else{
+
+                                    $subtotal = $item->get_subtotal( 'edit' );
+                                    $subtotal_tax = $item->get_subtotal_tax( 'edit' );
+                                    $total = $item->get_total( 'edit' );
+                                    $total_tax = $item->get_total_tax( 'edit' );
+                                    $taxes = $item->get_taxes();
+
+                                    // Split Item Qty in order. if not enough quantities in LocalDS are there.
+                                    $diff_qty = ( $qty - $dropship_qty );
+                                    $item1 = clone $item;
+                                    $item1->set_quantity( $dropship_qty );
+                                    $item1->set_subtotal( ($dropship_qty/$qty)* $subtotal );
+                                    $item1->set_subtotal_tax( ($dropship_qty/$qty)* $subtotal_tax );
+                                    $item1->set_total( ($dropship_qty/$qty)* $total );
+                                    $item1->set_total_tax( ($dropship_qty/$qty)* $total_tax );
+                                    $new_taxes = $taxes;
+                                    if( !empty( $taxes['total'] ) ){
+                                        foreach ( $taxes['total'] as $key => $value) {
+                                            $new_taxes['total'][$key] = ( $value * ($dropship_qty/$qty) );
+                                        }
+                                    }
+                                    if( !empty( $taxes['subtotal'] ) ){
+                                        foreach ( $taxes['subtotal'] as $key => $value) {
+                                            $new_taxes['subtotal'][$key] = ( $value * ($dropship_qty/$qty) );
+                                        }
+                                    }
+                                    $item1->set_taxes( $new_taxes );
+
+                                    $item1->apply_changes();
+                                    $items[$dropshipper][] = $item1;
+
+                                    // Package for default ds.
+                                    $item2 = clone $item;
+                                    $item2->set_quantity( $diff_qty );
+                                    $item2->set_subtotal( ($diff_qty/$qty)* $subtotal );
+                                    $item2->set_subtotal_tax( ($diff_qty/$qty)* $subtotal_tax );
+                                    $item2->set_total( ($diff_qty/$qty)* $total );
+                                    $item2->set_total_tax( ($diff_qty/$qty)* $total_tax );
+
+                                    $new_taxes2 = $taxes;
+                                    if( !empty( $taxes['total'] ) ){
+                                        foreach ( $taxes['total'] as $key => $value) {
+                                            $new_taxes2['total'][$key] = ( $value * ($diff_qty/$qty) );
+                                        }
+                                    }
+                                    if( !empty( $taxes['subtotal'] ) ){
+                                        foreach ( $taxes['subtotal'] as $key => $value) {
+                                            $new_taxes2['subtotal'][$key] = ( $value * ($diff_qty/$qty) );
+                                        }
+                                    }
+                                    $item2->set_taxes( $new_taxes2 );
+
+                                    $item2->apply_changes();
+                                    $items['knawat'][] = $item2;
+                                    continue;
+
+                                }
                             }
                         }
                     }
@@ -282,6 +345,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             $shipping_values = $this->knawat_dropshipwc_create_sub_order_shipping( $parent_order, $order_id, $order_items, $order_type );
             $shipping_cost   = $shipping_values['cost'];
             $shipping_tax    = $shipping_values['tax'];
+            $shipping_taxes    = $shipping_values['taxes'];
 
             // do tax
             $splited_order = wc_get_order( $order_id );
@@ -292,12 +356,13 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                     'order_item_type' => 'tax'
                 ) );
 
+                $shipping_tax_amount = isset( $shipping_taxes['taxes']['total'][$tax->get_rate_id()] ) ? $shipping_taxes['taxes']['total'][$tax->get_rate_id()] : $shipping_tax;
                 $tax_metas = array(
                     'rate_id'             => $tax->get_rate_id(),
                     'label'               => $tax->get_label(),
                     'compound'            => $tax->get_compound(),
                     'tax_amount'          => wc_format_decimal( array_sum( $items_tax[$tax->get_rate_id()] ) ),
-                    'shipping_tax_amount' => $shipping_tax
+                    'shipping_tax_amount' => $shipping_tax_amount
                 );
 
                 foreach( $tax_metas as $meta_key => $meta_value ) {
@@ -373,6 +438,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
     public function knawat_dropshipwc_create_sub_order_shipping( $parent_order, $order_id, $order_items, $order_type ) {
 
         $t_cost = $t_total_tax = 0;
+        $total_taxs = array( 'taxes' => array( 'total' => array() ) );
         foreach( $parent_order->get_items( array( 'shipping' ) ) as $shipping ) {
 
             $ship_data = $shipping->get_data();
@@ -412,10 +478,21 @@ class Knawat_Dropshipping_Woocommerce_Orders {
             }
             $t_cost += $shipping_metas['cost'];
             $t_total_tax += $shipping_metas['total_tax'];
+            if( !empty( $ship_data['taxes']['total'] ) ){
+                foreach ( $ship_data['taxes']['total'] as $key => $value ) {
+                    echo $key;
+                    echo $value;
+                    if( isset( $total_taxs['taxes']['total'][$key] ) ){
+                        $total_taxs['taxes']['total'][$key] += $value;
+                    }else{
+                        $total_taxs['taxes']['total'][$key] = $value;
+                    }
+                }
+            }
 
         }
 
-        return array( 'cost' => $t_cost, 'tax' => $t_total_tax );
+        return array( 'cost' => $t_cost, 'tax' => $t_total_tax, 'taxes' => $total_taxs );
     }
 
     /**
@@ -499,15 +576,30 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                     if( !empty( $dropshipper ) && $dropshipper != 'default' ){
                         // Get Available Dropshippers
                         $dropshippers = knawat_dropshipwc_get_dropshippers();
+                        $dropship_qty = get_post_meta( $variation_id, '_localds_stock', true );
+                        if( empty( $dropship_qty ) ){ $dropship_qty = 0; }
 
-                        if( isset( $dropshippers[$dropshipper] ) ){
+                        if( isset( $dropshippers[$dropshipper] ) && $dropship_qty > 0 ){
                             // Get Local DS's Country
                             $countries = $dropshippers[$dropshipper]['countries'];
                             // Get Shipping Country.
                             $ship_country = WC()->customer->get_shipping_country();
                             if( in_array( $ship_country,  $countries ) ){
-                                $localds_package_items[$dropshipper][ $item_key ] = $item;
-                                continue;
+                                $qty = $item['quantity'];
+                                if( $qty <= $dropship_qty ){
+                                    $localds_package_items[$dropshipper][ $item_key ] = $item;
+                                    continue;
+                                }else{
+                                    // Split Item Qty in Packages. if not enough quantities in localds are there.
+                                    $diff_qty = ( $qty - $dropship_qty );
+                                    $item['quantity'] = $dropship_qty;
+                                    $localds_package_items[$dropshipper][ $item_key ] = $item;
+
+                                    // Package for default ds.
+                                    $item['quantity'] = $diff_qty;
+                                    $split_package_items[ $item_key ] = $item;
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -581,18 +673,19 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         }
         return $packages;
     }
-    
+
     /**
      * Action hook to adjust item before save.
      *
      * @since 3.0.0
      */
     public function knawat_dropshipwc_add_shipping_meta_data( $item, $package_key, $package, $order ){
-        if( empty( $item ) || empty( $package_key ) ){
+
+        if( empty( $item ) ){
             return;
         }
 
-        if( isset( $package['package_type'] ) && $package['package_type'] != '' ){
+        if( isset( $package['package_type'] ) ){
             $item->add_meta_data( '_package_type', sanitize_text_field( $package['package_type'] ), true );
         }
     }
@@ -1293,7 +1386,7 @@ class Knawat_Dropshipping_Woocommerce_Orders {
                         $item_name    = $item->get_name();
                         $dropshippers = knawat_dropshipwc_get_dropshippers();
                         $dropshipper_name = $dropshippers[$dropshipper]['name'];
-                        $note         = sprintf( __( '%1$s stock reduced for "%2$s" from %3$s to %4$s.', 'woocommerce' ), $item_name, $dropshipper_name, $product_stock, ( $product_stock - $item_qty ) );
+                        $note         = sprintf( __( '%1$s stock reduced for "%2$s" from %3$s to %4$s.', 'dropshipping-woocommerce' ), $item_name, $dropshipper_name, $product_stock, ( $product_stock - $item_qty ) );
                         $order->add_order_note( $note );
                     }
                 }

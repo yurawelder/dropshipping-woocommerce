@@ -236,15 +236,15 @@ class Knawat_Dropshipping_Woocommerce{
 	public function get_dropshippers() {
 		$dropshippers = array(
 			'default' => array(
-				'id' 		=> 'default',
-				'name' 		=> 'Knawat Dropshipping',
-				'counties' 	=> 0
+				'id' 			=> 'default',
+				'name' 			=> __( 'Knawat Dropshipping', 'dropshipping-woocommerce' ),
+				'countries' 	=> 0
 			),
 			'knawat_saudi' => array(
-				'id' 		=> 'knawat_saudi',
-				'name' 		=> 'Saudi Knawat Dropshipping',
-				'counties' 	=> array( 'SA' )
-			),
+				'id' 			=> 'knawat_saudi',
+				'name' 			=> __( 'Saudi Knawat Dropshipping', 'dropshipping-woocommerce' ),
+				'countries' 	=> array( 'SA' )
+			)
 		);
 
 		return $dropshippers;
