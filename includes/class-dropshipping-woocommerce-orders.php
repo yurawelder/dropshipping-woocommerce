@@ -69,6 +69,10 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
         add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
 
+        /* Add Local DS in REST API order response */
+        add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
+        add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
+
         /* Disabled Emails for suborders */
         $email_ids = array(
             'new_order',
@@ -1227,6 +1231,34 @@ class Knawat_Dropshipping_Woocommerce_Orders {
         }
 
 		return $response;
+    }
+
+    /**
+     * Add 'Local DS' id and Name to the REST API.
+     *
+     * @since    1.2.0
+     *
+     * @param \WP_REST_Response $response The response object.
+     * @param \WP_Post $post Post object.
+     * @param \WP_REST_Request $request Request object.
+     * @return object updated response object
+     */
+    function knawat_dropshipwc_add_localds_api( $response, $post, $request ){
+
+        if( empty( $response->data ) ){
+            return $response;
+        }
+
+        $knawat_order_ds = get_post_meta( $post->get_id(), '_knawat_order_ds', true );
+        if( !empty( $knawat_order_ds ) ){
+            $dropshippers = knawat_dropshipwc_get_dropshippers();
+            if( isset( $dropshippers[$knawat_order_ds] ) ){
+                $response->data['order_dropshipper_id'] = $knawat_order_ds;
+                $response->data['order_dropshipper_name'] = isset( $dropshippers[$knawat_order_ds]['name'] ) ? $dropshippers[$knawat_order_ds]['name'] : '';
+            }
+        }
+
+        return $response;
     }
 
 
