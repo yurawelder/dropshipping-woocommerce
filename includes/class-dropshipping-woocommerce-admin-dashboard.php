@@ -80,7 +80,9 @@ class Knawat_Dropshipping_Woocommerce_Admin_Dashboard {
 			global $knawat_dropshipwc;
 			remove_filter( 'woocommerce_reports_get_order_report_query', array( $knawat_dropshipwc->orders, 'knawat_dropshipwc_admin_order_reports_remove_suborders' ) );
 			/* remove dokan's filter for remove sub orders from WooCommerce reports*/
-			remove_filter( 'woocommerce_reports_get_order_report_query', 'dokan_admin_order_reports_remove_parents' );
+			if ( defined( 'DOKAN_PLUGIN_VERSION' ) ) {
+				remove_filter( 'woocommerce_reports_get_order_report_query', 'dokan_admin_order_reports_remove_parents' );
+			}
 			add_filter( 'woocommerce_reports_get_order_report_data_args', array( $this, 'knawat_dropshipwc_reports_get_order_report_data_args' ) );
 
 			$sales_by_date                 = new WC_Report_Sales_By_Date();
@@ -94,7 +96,9 @@ class Knawat_Dropshipping_Woocommerce_Admin_Dashboard {
 			remove_filter( 'woocommerce_reports_get_order_report_data_args', array( $this, 'knawat_dropshipwc_reports_get_order_report_data_args' ) );
 			/* Remove sub orders from WooCommerce reports */
 			add_filter( 'woocommerce_reports_get_order_report_query', array( $knawat_dropshipwc->orders, 'knawat_dropshipwc_admin_order_reports_remove_suborders' ) );
-			add_filter( 'woocommerce_reports_get_order_report_query', 'dokan_admin_order_reports_remove_parents' );
+			if ( defined( 'DOKAN_PLUGIN_VERSION' ) ) {
+				add_filter( 'woocommerce_reports_get_order_report_query', 'dokan_admin_order_reports_remove_parents' );
+			}
 
 			/**
 			 * Count Total Knawat costs Over Knawat Orders.
