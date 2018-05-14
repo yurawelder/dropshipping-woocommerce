@@ -10,9 +10,10 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       dropshipping-woocommerce
  * Domain Path:       /languages
+ * WC requires at least: 3.0.0
+ * WC tested up to: 3.3.5
  *
  * @package     Knawat_Dropshipping_Woocommerce
- * @author      Dharmesh Patel <dspatel44@gmail.com>
  */
 
 // If this file is called directly, abort.
