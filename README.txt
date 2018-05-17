@@ -54,6 +54,14 @@ Knawat WooCommerce DropShipping allows you to Add products to your WooCommerce s
 
 == Changelog ==
 
+= 1.2.0 =
+* ADDED: Order splits based on Knawat and non-knawat product for better order handling.
+* ADDED: Dashboard widget for display Knawat status ( Sell and profit)
+* ADDED: Functionality for Multiple Dropshippers ( Local DS and Default DS)
+* ADDED: Knawat produc cost field in product variation edit screen
+* IMPROVEMENT: Some Improvements
+* FIXED: some bug fixes.
+
 = 1.1.0 =
 * ADDED: Filter option for Knawat Products and Orders
 * ADDED: Knawat Order Status
