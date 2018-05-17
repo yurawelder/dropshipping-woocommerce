@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the Knawat WooCommerce DropShipping package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Knawat WooCommerce DropShipping 1.1.0\n"
+"Project-Id-Version: Knawat WooCommerce DropShipping 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dropshipping-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-04-13 11:35:51+00:00\n"
+"POT-Creation-Date: 2018-05-17 09:47:50+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,41 +13,159 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: dropshipping-woocommerce.php:86 dropshipping-woocommerce.php:93
+#: dropshipping-woocommerce.php:89 dropshipping-woocommerce.php:96
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:58
-#: includes/class-dropshipping-woocommerce-admin.php:81
+#: dropshipping-woocommerce.php:225
+msgid "Knawat DropShipping"
+msgstr ""
+
+#: dropshipping-woocommerce.php:230
+msgid "Knawat DropShipping (Saudi Arabia)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:37
+msgid "Knawat status"
+msgstr ""
+
+#. translators: %s: net sales
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:142
+msgid "%s net sales this month"
+msgstr ""
+
+#. translators: %s: net profit
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:158
+msgid "%s net profit this month"
+msgstr ""
+
+#. translators: 1: top seller product title 2: top seller quantity
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:179
+msgid "%1$s top seller this month (sold %2$d)"
+msgstr ""
+
+#. translators: %s: order count
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:232
+msgid "<strong>%s order</strong> awaiting processing"
+msgid_plural "<strong>%s orders</strong> awaiting processing"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: order count
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:243
+msgid "<strong>%s order</strong> on-hold"
+msgid_plural "<strong>%s orders</strong> on-hold"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: order count
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:302
+msgid "<strong>%s product</strong> low in stock"
+msgid_plural "<strong>%s products</strong> low in stock"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: order count
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:313
+msgid "<strong>%s product</strong> out of stock"
+msgid_plural "<strong>%s products</strong> out of stock"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:65
+#: includes/class-dropshipping-woocommerce-admin.php:88
 msgid "Knawat Dropshipping"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:58
+#: includes/class-dropshipping-woocommerce-admin.php:65
 msgid "Dropshipping"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:82
+#: includes/class-dropshipping-woocommerce-admin.php:89
 msgid "Settings"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:140
+#: includes/class-dropshipping-woocommerce-admin.php:143
 msgid "Knawat Orders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:208
+#: includes/class-dropshipping-woocommerce-admin.php:221
 msgid "Knawat Products"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:259
+#: includes/class-dropshipping-woocommerce-admin.php:272
 msgid " Rate %1$s Dropshipping Woocommerce%2$s %3$s"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:319
+#: includes/class-dropshipping-woocommerce-admin.php:332
 msgid "Knawat Order Status:"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:334
+#: includes/class-dropshipping-woocommerce-admin.php:347
 msgid "Knawat Status"
+msgstr ""
+
+#. translators: %s: currency symbol
+#: includes/class-dropshipping-woocommerce-admin.php:400
+msgid "Knawat Cost (%s)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:457
+msgid "Dropshipper"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:460
+msgid "Select Dropshipper for this Product variantion."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:468
+msgid "Stock quantity (Dropshipper)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:470
+msgid "Enter a quantity of product variant for selected dropshipper."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:291
+msgid "Order &ndash; %s"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:291
+msgctxt "Order date parsed by strftime"
+msgid "%b %d, %Y @ %I:%M %p"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:718
+msgctxt "Admin: Order table column"
+msgid "Suborders"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:808
+msgid "Suborders"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:810
+msgid "Parent order"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:816
+msgid "Knawat Dropshipper"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:861
+msgid "Return to main order"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:1059
+msgid "Mark main order completed when all suborders are completed."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:1065
+msgid "Mark main order refunded when all suborders are refunded."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:1445
+msgid "%1$s stock reduced for \"%2$s\" from %3$s to %4$s."
 msgstr ""
 
 #: includes/class-dropshipping-woocommerce-pdf-invoice.php:48
@@ -110,20 +228,36 @@ msgstr ""
 msgid "Save Tracking"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:88
+#: includes/class-dropshipping-woocommerce-webhook.php:124
 msgid "Knawat Order created"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:89
+#: includes/class-dropshipping-woocommerce-webhook.php:125
 msgid "Knawat Order updated"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:90
+#: includes/class-dropshipping-woocommerce-webhook.php:126
 msgid "Knawat Order deleted"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:91
+#: includes/class-dropshipping-woocommerce-webhook.php:127
 msgid "Knawat Order restored"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-webhook.php:134
+msgid "Knawat Order created (%s)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-webhook.php:135
+msgid "Knawat Order updated (%s)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-webhook.php:136
+msgid "Knawat Order deleted (%s)"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-webhook.php:137
+msgid "Knawat Order restored (%s)"
 msgstr ""
 
 #: includes/knawat-merlin-config.php:29
@@ -745,9 +879,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.1.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.2.0)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.1.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.2.0)  #-#-#-#-#
 #. Description of the plugin/theme
 msgid "Knawat WooCommerce DropShipping"
 msgstr ""
