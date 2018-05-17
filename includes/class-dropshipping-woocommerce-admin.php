@@ -45,6 +45,13 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		// Add Knawat Order Status column to order list table
 		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'knawat_dropshipwc_render_shop_order_columns' ) );
+
+		// Display Knawat Cost in Variation
+		add_action( 'woocommerce_variation_options_pricing', array( $this, 'knawat_dropshipwc_add_knawat_cost_field' ), 10, 3 );
+
+		// Add & Save Product Variation Dropshipper and Quantity
+		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'knawat_dropshipwc_add_dropshipper_field' ), 10, 3 );
+		add_action( 'woocommerce_save_product_variation', array( $this, 'knawat_dropshipwc_save_dropshipper_field' ), 10, 2 );
 	}
 
 	/**
@@ -119,15 +126,11 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		$t_order_items = $wpdb->prefix . "woocommerce_order_items";
 		$t_order_itemmeta = $wpdb->prefix . "woocommerce_order_itemmeta";
 
-		$count_query = "SELECT COUNT( DISTINCT {$wpdb->posts}.ID ) as count FROM {$wpdb->posts} WHERE 1=1 AND {$wpdb->posts}.post_type = 'shop_order'
+		$count_query = "SELECT COUNT( DISTINCT {$wpdb->posts}.ID ) as count FROM {$wpdb->posts}
+			INNER JOIN {$wpdb->postmeta} as pm ON {$wpdb->posts}.ID = pm.post_id AND pm.meta_key = '_knawat_order'
+			WHERE 1=1 AND {$wpdb->posts}.post_type = 'shop_order'
 			AND ( {$wpdb->posts}.post_status != 'wc-cancelled' AND {$wpdb->posts}.post_status != 'trash' )
-			AND {$wpdb->posts}.ID IN (
-				SELECT DISTINCT order_id from {$t_order_items} AS oi
-				INNER JOIN {$t_order_itemmeta} as oim ON oi.order_item_id = oim.order_item_id
-				WHERE oi.order_item_type = 'line_item'
-				AND oim.meta_key = '_product_id'
-				AND oim.meta_value IN ( SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='dropshipping' AND meta_value='knawat' )
-			)";
+			AND pm.meta_value = 1";
 
 		$count = $wpdb->get_var( $count_query );
 
@@ -139,6 +142,10 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 
 			$views_html = sprintf( "<a class='%s' href='edit.php?post_type=shop_order&knawat_orders=1'>%s</a><span class='count'>(%d)</span>", $class, __('Knawat Orders', 'dropshipping-woocommerce' ), $count );
 			$views['knawat'] = $views_html;
+		}
+		// Removed Mine filter from order listing screen.
+		if( isset( $views['mine'] ) ){
+			unset( $views['mine'] );
 		}
 		return $views;
 	}
@@ -157,6 +164,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 
 	    if ( isset( $_GET[ 'knawat_orders' ] ) && !empty( $_GET[ 'knawat_orders' ] ) && trim( $_GET[ 'knawat_orders' ] ) == 1 ){
 			add_filter( 'posts_where' , array( $this, 'knawat_dropshipwc_posts_where_knawat_orders') );
+			add_filter( 'posts_join', array( $this, 'knawat_dropshipwc_posts_join_knawat_orders') );
 	    }
 	}
 
@@ -170,21 +178,26 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	function knawat_dropshipwc_posts_where_knawat_orders( $where ){
 	    global $wpdb;
 
-	    $t_order_items = $wpdb->prefix . "woocommerce_order_items";
-		$t_order_itemmeta = $wpdb->prefix . "woocommerce_order_itemmeta";
+		if ( isset( $_GET[ 'knawat_orders' ] ) && !empty( $_GET[ 'knawat_orders' ] ) && trim( $_GET[ 'knawat_orders' ] ) == 1 ){
+	        $where .= " AND ( {$wpdb->posts}.post_status != 'wc-cancelled' AND {$wpdb->posts}.post_status != 'trash' ) AND {$wpdb->postmeta}.meta_value = 1 ";
+	    }
+	    return $where;
+	}
+
+	/**
+	 * Add JOIN statement for filter only knawat orders in orders list table
+	 *
+	 * @since  1.0
+	 * @param  string $join join of SQL statement for orders query
+	 * @return string $join Modified join of SQL statement for orders query
+	 */
+	function knawat_dropshipwc_posts_join_knawat_orders( $join ){
+	    global $wpdb;
 
 	    if ( isset( $_GET[ 'knawat_orders' ] ) && !empty( $_GET[ 'knawat_orders' ] ) && trim( $_GET[ 'knawat_orders' ] ) == 1 ){
-	        $where .= " AND (( {$wpdb->posts}.post_status != 'wc-cancelled'
-				AND {$wpdb->posts}.post_status != 'trash'))
-				AND ID IN (
-	        	SELECT DISTINCT order_id from {$t_order_items} AS oi
-				INNER JOIN {$t_order_itemmeta} as oim ON oi.order_item_id = oim.order_item_id
-				WHERE oi.order_item_type = 'line_item' 
-				AND oim.meta_key = '_product_id'
-				AND oim.meta_value IN ( SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='dropshipping' AND meta_value='knawat' )
-	        )";
+			$join .= "INNER JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->postmeta}.meta_key = '_knawat_order'";
 	    }
-	    return $where;	
+	    return $join;
 	}
 
 
@@ -354,13 +367,130 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 			}
 
 			if( $knawat_order_status != '' ){
-				?>
-				<mark class="order-status"><span><?php echo ucfirst( $knawat_order_status ); ?></span></mark>
-				<?php
+				if ( version_compare( WC_VERSION, '3.3', '>=' ) ) {
+					?>
+					<mark class="order-status"><span><?php echo ucfirst( $knawat_order_status ); ?></span></mark>
+					<?php
+				}else{
+					?>
+					<span class="knawat-order-status"><?php echo ucfirst( $knawat_order_status ); ?></span>
+					<?php
+				}
 			}else{
 				echo '–';
 			}
 		}
 	}
 
+
+	/**
+	 * Render Read-Only Knawat Cost in Variation Prices block
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param int     $loop
+	 * @param array   $variation_data
+	 * @param WP_Post $variation
+	 */
+	public function knawat_dropshipwc_add_knawat_cost_field( $loop, $variation_data, $variation ){
+		$knawat_cost = get_post_meta( $variation->ID, '_knawat_cost', true );
+		if( !empty( $knawat_cost ) ){
+			$label = sprintf(
+				/* translators: %s: currency symbol */
+				__( 'Knawat Cost (%s)', 'dropshipping-woocommerce' ),
+				get_woocommerce_currency_symbol()
+			);
+			?>
+			<p class="form-field knawat_dropshipwc_knawat_cost form-row form-row-first">
+				<label for="knawat_cost<?php echo $loop; ?>"><?php echo $label; ?></label>
+				<input class="short knawat_cost" id="knawat_cost<?php echo $loop; ?>" value="<?php echo $knawat_cost; ?>" placeholder="<?php echo $label; ?>" type="text" disabled="disabled">
+			</p>
+			<?php
+		}
+	}
+
+
+	/**
+	 * Render Dropshipper and Qty field in Variation Attribute block
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param int     $loop
+	 * @param array   $variation_data
+	 * @param WP_Post $variation
+	 */
+	public function knawat_dropshipwc_add_dropshipper_field( $loop, $variation_data, $variation ){
+		global $knawat_dropshipwc;
+		$dropshippers_temp = $knawat_dropshipwc->get_dropshippers();
+		if ( empty( $dropshippers_temp ) ) {
+			return;
+		}
+		$dropshippers = array();
+		foreach ( $dropshippers_temp as $dropship ) {
+			$dropshippers[$dropship["id"]] = $dropship["name"];
+		}
+
+		$dropshipper = 'default';
+		$localds_stock = 0;
+
+		if( isset( $variation_data['_knawat_dropshipper'][0] ) ){
+			$dropshipper = $variation_data['_knawat_dropshipper'][0];
+			if( empty( $dropshipper ) ){
+				$dropshipper = 'default';
+			}
+		}
+		if( isset( $variation_data['_localds_stock'][0] ) ){
+			$localds_stock = $variation_data['_localds_stock'][0];
+			if( empty( $localds_stock ) ){
+				$localds_stock = 0;
+			}
+		}
+		?>
+
+		<div id="knawat_dropshipwc_dropshipper_<?php echo $variation->ID; ?>" class="knawat_dropshipwc_dropshipper_wrap">
+			<?php
+			woocommerce_wp_select( array(
+				'id'            => "knawat_dropshipper{$variation->ID}",
+				'name'          => "knawat_dropshipper[{$variation->ID}]",
+				'class'			=> 'knawat_dropshipper_select',
+				'value'         => $dropshipper,
+				'label'         => __('Dropshipper', 'dropshipping-woocommerce' ),
+				'options'       => $dropshippers,
+				'desc_tip'      => true,
+				'description'   => __( 'Select Dropshipper for this Product variantion.', 'dropshipping-woocommerce' ),
+				'wrapper_class' => 'knawat_dropshipwc_dropshipper form-row form-row-first',
+			) );
+
+			woocommerce_wp_text_input( array(
+				'id'                => "localds_stock{$variation->ID}",
+				'name'              => "localds_stock[{$variation->ID}]",
+				'value'             => $localds_stock,
+				'label'             => __( 'Stock quantity (Dropshipper)', 'dropshipping-woocommerce' ),
+				'desc_tip'          => true,
+				'description'       => __( "Enter a quantity of product variant for selected dropshipper.", 'dropshipping-woocommerce' ),
+				'type'              => 'number',
+				'wrapper_class'     => 'knawat_dropshipwc_localds_stock form-row form-row-last',
+			) );
+			?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Save Dropshipper and dropshipper Qty for Product variation
+	 *
+	 * @return void
+	 */
+	public function knawat_dropshipwc_save_dropshipper_field( $variation_id, $i ){
+
+		if( isset( $_POST['knawat_dropshipper'][$variation_id] ) ){
+			$dropshipper = isset( $_POST['knawat_dropshipper'][$variation_id] ) ? sanitize_text_field( $_POST['knawat_dropshipper'][$variation_id] ) : 'default';
+			update_post_meta( $variation_id, '_knawat_dropshipper', $dropshipper );
+		}
+
+		if( isset( $_POST['localds_stock'][$variation_id] ) ){
+			$localds_stock = isset( $_POST['localds_stock'][$variation_id] ) ? absint( $_POST['localds_stock'][$variation_id] ) : 0;
+			update_post_meta( $variation_id, '_localds_stock', $localds_stock );
+		}
+	}
 }

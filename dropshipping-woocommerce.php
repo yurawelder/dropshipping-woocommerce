@@ -3,16 +3,17 @@
  * Plugin Name:       Knawat WooCommerce DropShipping
  * Plugin URI:        https://wordpress.org/plugins/dropshipping-woocommerce/
  * Description:       Knawat WooCommerce DropShipping
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            Knawat Team
  * Author URI:        https://github.com/Knawat
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       dropshipping-woocommerce
  * Domain Path:       /languages
+ * WC requires at least: 3.0.0
+ * WC tested up to: 3.3.5
  *
  * @package     Knawat_Dropshipping_Woocommerce
- * @author      Dharmesh Patel <dspatel44@gmail.com>
  */
 
 // If this file is called directly, abort.
@@ -56,7 +57,9 @@ class Knawat_Dropshipping_Woocommerce{
 			self::$instance->includes();
 			self::$instance->common = new Knawat_Dropshipping_Woocommerce_Common();
 			self::$instance->admin = new Knawat_Dropshipping_Woocommerce_Admin();
-
+			if( self::$instance->is_woocommerce_activated() ){
+				self::$instance->orders = new Knawat_Dropshipping_Woocommerce_Orders();
+			}
 			/**
 			* The code that runs during plugin activation.
 			*/
@@ -83,16 +86,15 @@ class Knawat_Dropshipping_Woocommerce{
 	 *
 	 * @since 1.0.0
 	 */
-	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.1.0' ); }
+	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
 
 	/**
 	 * A dummy magic method to prevent Knawat_Dropshipping_Woocommerce from being unserialized.
 	 *
 	 * @since 1.0.0
 	 */
-	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.1.0' ); }
-
-
+	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
+	
 	/**
 	 * Setup plugins constants.
 	 *
@@ -104,7 +106,7 @@ class Knawat_Dropshipping_Woocommerce{
 
 		// Plugin version.
 		if( ! defined( 'KNAWAT_DROPWC_VERSION' ) ){
-			define( 'KNAWAT_DROPWC_VERSION', '1.1.0' );
+			define( 'KNAWAT_DROPWC_VERSION', '1.2.0' );
 		}
 
 		// Plugin folder Path.
@@ -149,6 +151,8 @@ class Knawat_Dropshipping_Woocommerce{
 		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-pdf-invoice.php';
 		if( $this->is_woocommerce_activated() ){
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-shipment-tracking.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-orders.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-admin-dashboard.php';
 		}
 		/**
 		 * Recommended and required plugins.
@@ -205,6 +209,30 @@ class Knawat_Dropshipping_Woocommerce{
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get Defined DropShippers.
+	 *
+	 * @access public
+	 * @since 1.2.0
+	 * @return array
+	 */
+	public function get_dropshippers() {
+		$dropshippers = array(
+			'default' => array(
+				'id' 			=> 'default',
+				'name' 			=> __( 'Knawat DropShipping', 'dropshipping-woocommerce' ),
+				'countries' 	=> 0
+			),
+			'knawat_saudi' => array(
+				'id' 			=> 'knawat_saudi',
+				'name' 			=> __( 'Knawat DropShipping (Saudi Arabia)', 'dropshipping-woocommerce' ),
+				'countries' 	=> array( 'SA' )
+			)
+		);
+
+		return $dropshippers;
 	}
 
 }

@@ -106,3 +106,19 @@ function knawat_dropshipwc_is_connected(){
 
 	return false;
 }
+
+/**
+ * Get Defined DropShippers.
+ *
+ * @access public
+ * @since 1.2.0
+ * @return array
+ */
+function knawat_dropshipwc_get_dropshippers() {
+	global $knawat_dropshipwc;
+    $dropshippers = $knawat_dropshipwc->get_dropshippers();
+    if( empty( $dropshippers ) && !is_array( $dropshippers ) ){
+		$dropshippers = array();
+    }
+    return $dropshippers;
+}
