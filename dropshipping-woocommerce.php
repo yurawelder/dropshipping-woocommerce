@@ -174,6 +174,7 @@ class Knawat_Dropshipping_Woocommerce{
 	public function init_includes() {
 		// API
 		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-handshake.php';
+		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-rest-controller.php';
 	}
 
 	/**

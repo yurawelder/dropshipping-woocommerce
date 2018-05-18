@@ -122,3 +122,29 @@ function knawat_dropshipwc_get_dropshippers() {
     }
     return $dropshippers;
 }
+
+/**
+ * Get Knawat DropShipping Options.
+ *
+ * @access public
+ * @since 2.0.0
+ * @return array
+ */
+function knawat_dropshipwc_get_options( $key = '' ) {
+	$knawat_options = get_option( KNAWAT_DROPWC_OPTIONS, array() );
+	if ( $key != '' ) {
+		$knawat_options = isset( $knawat_options[$key] ) ? $knawat_options[$key] : '';
+	}
+	return $knawat_options;
+}
+
+/**
+ * Update Knawat DropShipping Options.
+ *
+ * @access public
+ * @since 2.0.0
+ * @return array
+ */
+function knawat_dropshipwc_update_options( $knawat_options ) {
+	update_option( KNAWAT_DROPWC_OPTIONS, $knawat_options );
+}
