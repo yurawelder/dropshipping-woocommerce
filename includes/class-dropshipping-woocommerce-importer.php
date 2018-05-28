@@ -98,7 +98,14 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 		switch ( $this->import_type ) {
 			case 'full':
 				$this->data = $this->mp_api->get( 'catalog/products/?limit='.$this->params['limit'].'&page='.$this->params['page'] );
-				//error_log( print_r( $this->params, true ) );
+				break;
+
+			case 'single':
+				$sku = sanitize_text_field( $this->params['sku'] );
+				if( empty( $sku ) ){
+					return array( 'status' => 'fail', 'message' => __( 'Please provide product sku.', 'dropshipping-woocommerce' ) );
+				}
+				$this->data = $this->mp_api->get( 'catalog/products/'. $sku );
 				break;
 
 			default:
@@ -107,16 +114,19 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 		if( !is_wp_error( $this->data ) ){
 			$response = $this->data;
-			if( isset( $response->products ) ){
-				$products = $response->products;
+			if( isset( $response->products ) || ( 'single' === $this->import_type && isset( $response->product ) ) ){
 
-				$this->params['products_total'] = count( $products );
-				if( $this->params['products_total'] === 0 ){
-					$this->params['is_complete'] = true;
-				}elseif( $this->params['products_total'] < $this->params['limit'] ){
-					$this->params['is_complete'] = true;
+				$products = array();
+				if ( 'single' === $this->import_type ) {
+					$products[] = $response->product;
 				}else{
-					$this->params['is_complete'] = false;
+					$products = $response->products;
+				}
+				// Update Product totals.
+				$this->params['products_total'] = count( $products );
+				if( empty( $products ) ){
+					$this->params['is_complete'] = true;
+					return $data;
 				}
 
 				foreach( $products as $index => $product ){
@@ -164,12 +174,21 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 						break;
 					}
 				}
-			}
 
-			$this->params['imported'] += count( $data['imported'] );
-			$this->params['failed']   += count( $data['failed'] );
-			$this->params['updated']  += count( $data['updated'] );
-			return $this->params;
+				if( $this->params['products_total'] === 0 ){
+					$this->params['is_complete'] = true;
+				}elseif( $this->params['products_total'] < $this->params['limit'] ){
+					$this->params['is_complete'] = true;
+				}else{
+					$this->params['is_complete'] = false;
+				}
+
+				return $data;
+			}else{
+				return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
+			}
+		}else{
+			return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
 		}
 	}
 
@@ -449,6 +468,12 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 		return wc_stock_amount( $value );
 	}
 
+	/**
+	 * Get Import Parameters
+	 *
+	 * @param string $value Field value.
+	 * @return float|string
+	 */
 	public function get_import_params(){
 		return $this->params;
 	}

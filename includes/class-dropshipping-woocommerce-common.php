@@ -198,3 +198,18 @@ function knawat_dropshipwc_get_activated_plugins(){
 
 	return $active_plugins;
 }
+
+/**
+ * Get Knawat Compatible Active plugins
+ *
+ * @return array Knawat Compatible plugins with status.
+ */
+function knawat_dropshipwc_import_product_by_sku( $sku, $force_update = false ){
+	if( empty( $sku ) ){
+		return false;
+	}
+	$sku = sanitize_text_field( $sku );
+	$importer = new Knawat_Dropshipping_Woocommerce_Importer( 'single', array( 'sku' => $sku, 'limit' => 1, 'force_update' => $force_update ) );
+	$import = $importer->import();
+	return $import;
+}
