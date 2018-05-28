@@ -148,3 +148,53 @@ function knawat_dropshipwc_get_options( $key = '' ) {
 function knawat_dropshipwc_update_options( $knawat_options ) {
 	update_option( KNAWAT_DROPWC_OPTIONS, $knawat_options );
 }
+
+/**
+ * Get Knawat MP Consumer Keys
+ *
+ * @return array Knawat MP Consumer Keys
+ */
+function knawat_dropshipwc_get_consumerkeys(){
+	$consumer_keys  = array();
+	$knawat_options = knawat_dropshipwc_get_options();
+	if( isset( $knawat_options['mp_consumer_key'] ) && !empty( $knawat_options['mp_consumer_key'] ) ){
+		$consumer_keys['consumer_key'] = $knawat_options['mp_consumer_key'];
+	}
+	if( isset( $knawat_options['mp_consumer_secret'] ) && !empty( $knawat_options['mp_consumer_secret'] ) ){
+		$consumer_keys['consumer_secret'] = $knawat_options['mp_consumer_secret'];
+	}
+	return $consumer_keys;
+}
+
+/**
+ * Get Knawat Compatible Active plugins
+ *
+ * @return array Knawat Compatible plugins with status.
+ */
+function knawat_dropshipwc_get_activated_plugins(){
+	$active_plugins = array(
+		'featured-image-by-url' =>false,
+		'woocommerce-currency-switcher' =>false,
+		'qtranslate-x' =>false		
+	);
+
+	$blog_plugins = get_option( 'active_plugins', array() );
+	$site_plugins = is_multisite() ? (array) maybe_unserialize( get_site_option('active_sitewide_plugins' ) ) : array();
+	
+	// Check if qTranslate X is activated
+	if ( in_array( 'qtranslate-x/qtranslate.php', $blog_plugins ) || isset( $site_plugins['qtranslate-x/qtranslate.php'] ) ) {
+		$active_plugins['qtranslate-x'] = true;
+	}
+
+	// Check if Featued image by URL is activated
+	if ( in_array( 'featured-image-by-url/featured-image-by-url.php', $blog_plugins ) || isset( $site_plugins['featured-image-by-url/featured-image-by-url.php'] ) ) {
+		$active_plugins['featured-image-by-url'] = true;
+	}
+
+	// Check if WooCommerce Currency Switcher is activated
+	if ( in_array( 'woocommerce-currency-switcher/index.php', $blog_plugins ) || isset( $site_plugins['woocommerce-currency-switcher/index.php'] ) ) {
+		$active_plugins['woocommerce-currency-switcher'] = true;
+	}
+
+	return $active_plugins;
+}

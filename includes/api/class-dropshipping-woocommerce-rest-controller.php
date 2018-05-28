@@ -106,7 +106,7 @@ class Knawat_Dropshipping_Woocommerce_REST_Controller extends WC_REST_Controller
      * @return WP_Error|WP_REST_Response
      */
     public function get_knawat_mpapi_consumerkeys( $request ) {
-        $response = $this->get_knawat_mp_consumer_keys();
+        $response = knawat_dropshipwc_get_consumerkeys();
 
         /**
          * Filter Knawat MP Consumer Keys, before respond
@@ -149,7 +149,7 @@ class Knawat_Dropshipping_Woocommerce_REST_Controller extends WC_REST_Controller
          */
         do_action( 'knawat_dropshipwc_api_consumer_keys_updated', $knawat_options, $request );
 
-        $response = $this->get_knawat_mp_consumer_keys();
+        $response = knawat_dropshipwc_get_consumerkeys();
         return rest_ensure_response( $response );
     }
 
@@ -174,7 +174,7 @@ class Knawat_Dropshipping_Woocommerce_REST_Controller extends WC_REST_Controller
          */
         do_action( 'knawat_dropshipwc_api_consumer_keys_deleted', $knawat_options, $request );
 
-        $consumer_keys = $this->get_knawat_mp_consumer_keys();
+        $consumer_keys = knawat_dropshipwc_get_consumerkeys();
         if( empty( $consumer_keys ) ){
             $response = array( 
                 'status'=> 'success',
@@ -187,23 +187,6 @@ class Knawat_Dropshipping_Woocommerce_REST_Controller extends WC_REST_Controller
             );
         }
         return rest_ensure_response( $response );
-    }
-
-    /**
-     * Get Knawat MP Consumer Keys
-     *
-     * @return array Knawat MP Consumer Keys
-     */
-    public function get_knawat_mp_consumer_keys(){
-        $consumer_keys  = array();
-        $knawat_options = knawat_dropshipwc_get_options();
-        if( isset( $knawat_options['mp_consumer_key'] ) && !empty( $knawat_options['mp_consumer_key'] ) ){
-            $consumer_keys['consumer_key'] = $knawat_options['mp_consumer_key'];
-        }
-        if( isset( $knawat_options['mp_consumer_secret'] ) && !empty( $knawat_options['mp_consumer_secret'] ) ){
-            $consumer_keys['consumer_secret'] = $knawat_options['mp_consumer_secret'];
-        }
-        return $consumer_keys;
     }
 
 }
