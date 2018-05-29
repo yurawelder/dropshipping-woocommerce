@@ -22,6 +22,8 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		// Do anything Here. 
 		add_action( 'knawat_dropshipwc_run_product_import', array( $this, 'knawat_dropshipwc_backgorund_product_importer' ) );
 		add_action( 'admin_init', array( $this, 'handle_knawat_settings_submit' ), 99 );
+		add_action( 'woocommerce_add_to_cart',  array( $this, 'knawat_dropshipwc_add_to_cart' ), 10, 2 );
+		add_action( 'woocommerce_before_single_product', array( $this, 'knawat_dropshipwc_before_single_product' ) );
 	}
 
 	/**
@@ -140,6 +142,83 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			$knawatdswc_success[] = __( 'Settings has been saved successfully.', 'dropshipping-woocommerce' );
 		}
 	}
+
+	/**
+	 * Sync prduct with knawat.com during product add_to_cart
+	 *
+	 * @since 2.0.0
+	 */
+	public function knawat_dropshipwc_add_to_cart( $cart_item_key, $product_id ){
+		if( empty( $product_id ) ){
+			return;
+		}
+		// Update product
+		$this->knawat_dropshipwc_async_product_update_by_id( $product_id );
+	}
+
+	/**
+	 * Sync prduct with knawat.com during custmer visit single product page
+	 *
+	 * @since 2.0.0
+	 */
+	public function knawat_dropshipwc_before_single_product(){
+		$product_id = get_the_ID();
+		if( empty( $product_id ) ){
+			return;
+		}
+		// Update product
+		$this->knawat_dropshipwc_async_product_update_by_id( $product_id );
+	}
+
+	/**
+	 * Run Async call for Sync prduct with knawat.com by product_id
+	 *
+	 * @param $product_id 			int  Product ID.
+	 *
+	 * @since 2.0.0
+	 */
+	public function knawat_dropshipwc_async_product_update_by_id( $product_id ){
+
+		if( empty( $product_id ) ){
+			return;
+		}
+
+		$product = new WC_Product( $product_id );
+		$sku = $product->get_sku();
+
+		if( empty( $sku ) ){
+			return;
+		}
+
+		if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) ) {
+			return;
+		}
+
+		// Async Product Update.
+		$async_request = new Knawat_Dropshipping_WC_Async_Request();
+		$async_request->data( array( 'sku' => $sku ) );
+		$async_request->dispatch();
+	}
+
+	/**
+	 * Sync prduct with knawat.com by Sku
+	 *
+	 * @param $sku 			string  Product SKU.
+	 * @param $force_update boolean True if is force update.
+	 * @return array Import status.
+	 *
+	 * @since 2.0.0
+	 */
+	function knawat_dropshipwc_import_product_by_sku( $sku, $force_update = false ){
+		if( empty( $sku ) ){
+			return false;
+		}
+		$sku = sanitize_text_field( $sku );
+		$importer = new Knawat_Dropshipping_Woocommerce_Importer( 'single', array( 'sku' => $sku, 'limit' => 1, 'force_update' => $force_update ) );
+		$import = $importer->import();
+		return $import;
+	}
+
 }
 
 /*
@@ -259,19 +338,4 @@ function knawat_dropshipwc_get_activated_plugins(){
 	}
 
 	return $active_plugins;
-}
-
-/**
- * Get Knawat Compatible Active plugins
- *
- * @return array Knawat Compatible plugins with status.
- */
-function knawat_dropshipwc_import_product_by_sku( $sku, $force_update = false ){
-	if( empty( $sku ) ){
-		return false;
-	}
-	$sku = sanitize_text_field( $sku );
-	$importer = new Knawat_Dropshipping_Woocommerce_Importer( 'single', array( 'sku' => $sku, 'limit' => 1, 'force_update' => $force_update ) );
-	$import = $importer->import();
-	return $import;
 }
