@@ -10,8 +10,8 @@ var Knawat_Merlin = (function($){
             plugins.init(btn);
         },
         knawat_connect: function(btn){
-            var plugins = new KnawatConnect();
-            plugins.init(btn);
+            var knawat_connect = new KnawatConnect();
+            knawat_connect.init(btn);
         }
     };
 
@@ -98,15 +98,19 @@ var Knawat_Merlin = (function($){
                 notice.addClass("lead error");
                 notice.html(r.error);
                 jQuery('.merlin_knawat').removeClass("merlin__button--loading");
+                jQuery('.merlin_knawat').data("done-loading", "no");
             }
         }
 
         function do_ajax() {
-            knawatAPIKey = $("#knawat-connect-status").val();
+            knawatAPIKey = $("#mp_consumer_key").val();
+            knawatAPISecret = $("#mp_consumer_secret").val();
+
             jQuery.post(merlin_params.ajaxurl, {
                 action: "merlin_knawat_connect",
                 wpnonce: merlin_params.wpnonce,
-                kAPIKey: knawatAPIKey
+                kAPIKey: knawatAPIKey,
+                kAPISecret: knawatAPISecret
             }, ajax_callback).fail(ajax_callback);
         }
 
@@ -286,86 +290,3 @@ var Knawat_Merlin = (function($){
 })(jQuery);
 
 Knawat_Merlin.init();
-
-function KnawatPopupCenter(url, title, w, h) {
-    // Fixes dual-screen position
-    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
-
-    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-    var top = ((height / 2) - (h / 2)) + dualScreenTop;
-    var newWindow = window.open(url, title, 'scrollbars=yes, location=0, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-    // Puts focus on the newWindow
-    if (window.focus) {
-        newWindow.focus();
-    }
-}
-
-
-
-// For login with Knawat.com
-function KnawatPopup1() {
-
-    var w = 420;
-    var h = 600;
-    // Center Popup Logic
-    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
-    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-    var top = ((height / 2) - (h / 2)) + dualScreenTop;
-
-    const step1Popup = window.open(
-        'https://app.knawat.com/autologin?returnurl=' + location.origin,
-        'knawatLogin',
-        'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' + w + ',height=' + h + ',top=' + top + ',left=' + left),
-    checkUrlInterval = setInterval(() => {
-        try {
-            if ( step1Popup.location.origin === location.origin ) {
-                clearInterval(checkUrlInterval);
-                step1Popup.close();
-                jQuery(".knawat_connect_step_1").hide();
-                jQuery(".knawat_connect_step_2").show();
-            }
-        } catch (error) {
-            // this should be triggered while popup has another site in location.href
-        }
-    }, 100);
-}
-
-// For connect site with Knawat.com
-function KnawatPopup2() {
-
-    var w = 740;
-    var h = 700;
-    // Center Popup Logic
-    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
-    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-    var top = ((height / 2) - (h / 2)) + dualScreenTop;
-
-    const step2Popup = window.open(
-        'https://app.knawat.com/stores/validate/woocommerce/' + escape(encodeURIComponent(location.origin)) + '?returnurl=' + location.origin,
-        'knawatAddWooCommerce',
-        'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' + w + ',height=' + h + ',top=' + top + ',left=' + left),
-    checkUrlInterval = setInterval(() => {
-        try {
-            if (step2Popup.location.origin === location.origin ) {
-                clearInterval(checkUrlInterval);
-                step2Popup.close();
-
-                jQuery("#knawat-connect-status").val('connected')
-                jQuery('#knawat_connect_next').trigger("click");
-            }
-        } catch (error) {
-            // this should be triggered while popup has another site in location.href
-        }
-    }, 100);
-}

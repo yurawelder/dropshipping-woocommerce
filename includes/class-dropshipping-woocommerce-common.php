@@ -112,7 +112,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		global $knawatdswc_success;
 		if ( isset( $_POST['knawatds_action'] ) && $_POST['knawatds_action'] == 'knawatds_save_settings' ) {
 			// Verify nonce.
-			check_admin_referer( 'knawatds_setting_form_nonce_action', 'knawatds_setting_form_nonce1' );
+			check_admin_referer( 'knawatds_setting_form_nonce_action', 'knawatds_setting_form_nonce' );
 
 			$knawatds_options = isset( $_POST['knawat'] ) ? $_POST['knawat'] : array();
 			$current_options = knawat_dropshipwc_get_options();
