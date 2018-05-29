@@ -185,10 +185,12 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 				return $data;
 			}else{
+				error_log( $this->data );
 				return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
 			}
 		}else{
-			return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
+			error_log( $this->data );
+			return array( 'status' => 'fail', 'message' => $this->data->get_error_message() );
 		}
 	}
 
@@ -325,6 +327,9 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					$temp_variant['type'] = 'variation';
 				}
 
+				// Add Meta Data.
+				$temp_variant['meta_data'] = array();
+
 				if( $product_id && !$this->params['force_update'] ){
 
 					$temp_variant['price'] = wc_format_decimal( $variation->sale_price );
@@ -341,6 +346,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					}
 					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
 					$temp_variant['weight'] = $this->parse_stock_quantity_field( $variation->weight );
+					$temp_variant['meta_data'][] = array( 'key' => '_knawat_cost', 'value' => wc_format_decimal( $variation->cost_price ) );
 
 					if( isset( $variation->attributes ) && !empty( $variation->attributes ) ){
 						foreach ( $variation->attributes as $attribute ) {

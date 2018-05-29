@@ -20,6 +20,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 	 */
 	public function __construct() {
 		// Do anything Here. 
+		add_action( 'knawat_dropshipwc_run_product_import', array( $this, 'knawat_dropshipwc_backgorund_product_importer' ) );
 	}
 
 	/**
@@ -78,6 +79,29 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		}
 		return false;
 	}
+
+	/**
+	 * Knawat Run Background import. This function is called by hourly cron.
+	 *
+	 * @since    1.0.0
+	 * @return 	 boolean
+	 */
+	public function knawat_dropshipwc_backgorund_product_importer(){
+		$consumer_keys = knawat_dropshipwc_get_consumerkeys();
+		if( empty( $consumer_keys ) ){
+			return;
+		}
+
+		if ( ! class_exists( 'Knawat_Dropshipping_WC_Background', false ) ) {
+			return;
+		}
+		$data = array();
+		$data['limit'] = 5;
+		$import_process = new Knawat_Dropshipping_WC_Background();
+		$import_process->push_to_queue( $data );
+		$import_process->save()->dispatch();
+	}
+
 }
 
 /*

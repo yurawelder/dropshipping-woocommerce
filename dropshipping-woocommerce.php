@@ -265,3 +265,31 @@ function run_knawat_dropshipwc_woocommerce() {
 
 // Get Knawat_Dropshipping_Woocommerce Running.
 $GLOBALS['knawat_dropshipwc'] = run_knawat_dropshipwc_woocommerce();
+
+/**
+ * The code that runs during plugin activation.
+ *
+ * Add Hourly Scheduled import
+ *
+ * @since 2.0.0
+ */
+function knawat_dropshipwc_activate_knawatdswc() {
+	if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
+		// Add Hourly Scheduled import.
+        wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+    }
+}
+register_activation_hook( __FILE__, 'knawat_dropshipwc_activate_knawatdswc' );
+
+/**
+ * The code that runs during plugin deactivation.
+ *
+ * Remove Hourly Scheduled import
+ *
+ * @since 2.0.0
+ */
+function knawat_dropshipwc_deactivate_knawatdswc() {
+	// Remove Hourly Scheduled import
+    wp_clear_scheduled_hook( 'knawat_dropshipwc_run_product_import' );
+}
+register_deactivation_hook( __FILE__, 'knawat_dropshipwc_deactivate_knawatdswc' );
