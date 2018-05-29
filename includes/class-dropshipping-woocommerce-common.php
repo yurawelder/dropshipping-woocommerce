@@ -96,6 +96,17 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		if ( ! class_exists( 'Knawat_Dropshipping_WC_Background', false ) ) {
 			return;
 		}
+
+		global $wpdb;
+		$count_query = "SELECT count(option_id) as count FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' ORDER BY option_id ASC";
+		$count = $wpdb->get_var( $count_query );
+
+		if( $count > 0 ){
+			global $knawatdswc_errors;
+			$knawatdswc_errors[] = __( 'Another product import is in process already.', 'dropshipping-woocommerce' );
+			return false;
+		}
+
 		$data = array();
 		$data['limit'] = 5;
 		$import_process = new Knawat_Dropshipping_WC_Background();
