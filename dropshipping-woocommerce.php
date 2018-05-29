@@ -264,7 +264,9 @@ function run_knawat_dropshipwc_woocommerce() {
 }
 
 // Get Knawat_Dropshipping_Woocommerce Running.
+global $knawatdswc_errors, $knawatdswc_success;
 $GLOBALS['knawat_dropshipwc'] = run_knawat_dropshipwc_woocommerce();
+$knawatdswc_errors = $knawatdswc_success = array();
 
 /**
  * The code that runs during plugin activation.

@@ -41,6 +41,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_load_custom_knawat_order_filter' ) );
 		add_filter( 'admin_footer_text', array( $this, 'add_dropshipping_woocommerce_credit' ) );
 		add_action( 'woocommerce_admin_order_data_after_order_details', array( $this, 'knawat_dropshipwc_add_knawat_order_status_in_backend' ), 10 );
+		add_action( 'admin_notices', array( $this, 'display_notices') );
 
 		// Add Knawat Order Status column to order list table
 		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
@@ -86,7 +87,6 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		?>
 		<div class="wrap">
 		    <h1><?php esc_html_e( 'Knawat Dropshipping', 'dropshipping-woocommerce' ); ?></h1>
-		    <h2><?php esc_html_e( 'Settings', 'dropshipping-woocommerce' ); ?></h2>
 		    <?php
 		    // Set Default Tab to Import.
 		    $tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'settings';
@@ -306,6 +306,36 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function enqueue_admin_styles( $hook ) {
 		$css_dir  = KNAWAT_DROPWC_PLUGIN_URL . 'assets/css/';
 		wp_enqueue_style('dropshipping-woocommerce', $css_dir . 'dropshipping-woocommerce-admin.css', false, "" );
+	}
+
+	/**
+	 * Display notices in admin.
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_notices() {
+		global $knawatdswc_errors, $knawatdswc_success;
+
+		if ( ! empty( $knawatdswc_errors ) ) {
+			foreach ( $knawatdswc_errors as $error ) :
+			    ?>
+			    <div class="notice notice-error is-dismissible">
+			        <p><?php echo $error; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
+		if ( ! empty( $knawatdswc_success ) ) {
+			foreach ( $knawatdswc_success as $success ) :
+			    ?>
+			    <div class="notice notice-success is-dismissible">
+			        <p><?php echo $success; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
 	}
 
 	/**

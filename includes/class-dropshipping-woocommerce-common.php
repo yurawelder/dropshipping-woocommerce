@@ -21,6 +21,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 	public function __construct() {
 		// Do anything Here. 
 		add_action( 'knawat_dropshipwc_run_product_import', array( $this, 'knawat_dropshipwc_backgorund_product_importer' ) );
+		add_action( 'admin_init', array( $this, 'handle_knawat_settings_submit' ), 99 );
 	}
 
 	/**
@@ -102,6 +103,32 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		$import_process->save()->dispatch();
 	}
 
+	/**
+	 * Process settings form and save settings.
+	 *
+	 * @since    2.0.0
+	 */
+	public function handle_knawat_settings_submit() {
+		global $knawatdswc_success;
+		if ( isset( $_POST['knawatds_action'] ) && $_POST['knawatds_action'] == 'knawatds_save_settings' ) {
+			// Verify nonce.
+			check_admin_referer( 'knawatds_setting_form_nonce_action', 'knawatds_setting_form_nonce1' );
+
+			$knawatds_options = isset( $_POST['knawat'] ) ? $_POST['knawat'] : array();
+			$current_options = knawat_dropshipwc_get_options();
+			if( isset( $knawatds_options['mp_consumer_key'] ) ){
+				$current_options['mp_consumer_key'] = sanitize_text_field( $knawatds_options['mp_consumer_key'] );
+			}
+			if( isset( $knawatds_options['mp_consumer_secret'] ) ){
+				$current_options['mp_consumer_secret'] = sanitize_text_field( $knawatds_options['mp_consumer_secret'] );
+			}
+			knawat_dropshipwc_update_options( $current_options );
+
+			// Remove knawat_mp_access_channel transient for re-fetch token
+			delete_transient( 'knawat_mp_access_channel' );
+			$knawatdswc_success[] = __( 'Settings has been saved successfully.', 'dropshipping-woocommerce' );
+		}
+	}
 }
 
 /*

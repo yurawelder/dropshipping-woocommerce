@@ -2,34 +2,59 @@
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$knawat_options = get_option( KNAWAT_DROPWC_OPTIONS, array() );
-$knawat_connected = 0;
-if( knawat_dropshipwc_is_connected() ) {
-	$knawat_connected = 1;
-}
+$knawat_options = knawat_dropshipwc_get_options();
+$mp_consumer_key = isset( $knawat_options['mp_consumer_key'] ) ? esc_attr( $knawat_options['mp_consumer_key'] ) : '';
+$mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr( $knawat_options['mp_consumer_secret'] ) : '';
 ?>
 <div class="knawat_dropshipwc_settings">
-	<table class="form-table">
-		<tbody>
-			<tr class="knawat_dropshipwc_row">
-				<th scope="row">
-					<label for="knawat_dropshipwc_connect">
-						<?php esc_html_e( 'Connect Your store with Knawat', 'dropshipping-woocommerce' ); ?>
-					</label>
-				</th>
-				<td>
-					<?php if( $knawat_connected ){ ?>
-						<div class="knawat_dropshipwc_connected">
-							<span class="dashicons dashicons-yes" style="background-color: green;color: #fff;border-radius: 50%;padding: 4px 4px 3px 3px;"></span> 
-							<strong style="color: green; font-size: 18px;" > <?php esc_html_e( 'Connected', 'dropshipping-woocommerce' ); ?></strong>
-						</div>
-					<?php }else{ ?>
-						<a class="button button-primary" href="<?php echo admin_url('admin.php?page=knawat_setup&step=knawat_connect'); ?>">
-							<?php esc_html_e( 'Connect', 'dropshipping-woocommerce' ); ?>
-						</a>
-					<?php } ?>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+
+	<h3 class="knawat_setting_bar"><?php esc_attr_e( 'Settings', 'dropshipping-woocommerce' ); ?></h3>
+	<p><?php _e( 'You need a Knawat consumer key and consumer secret for import products into your store from knawat.com','dropshipping-woocommerce' ); ?></p>
+	<form method="post" id="knawatds_setting_form">
+		<table class="form-table">
+			<tbody>
+				<?php do_action( 'knawat_dropshipwc_before_settings_section' ); ?>
+
+				<tr class="knawat_dropshipwc_row">
+					<th scope="row">
+						<?php _e( 'Knawat Consumer Key','dropshipping-woocommerce' ); ?>
+					</th>
+					<td>
+						<input class="mp_consumer_key regular-text" name="knawat[mp_consumer_key]" type="text" value="<?php if ( $mp_consumer_key != '' ) { echo $mp_consumer_key; } ?>" />
+						<p class="description" id="mp_consumer_key-description">
+							<?php
+							printf( '%s <a href="https://app.knawat.com/" target="_blank">%s</a>',
+								__('You can get your Knawat Consumer Key', 'dropshipping-woocommerce' ),
+								__('from here', 'dropshipping-woocommerce' )
+							);
+							?>
+						</p>
+					</td>
+				</tr>
+
+				<tr class="knawat_dropshipwc_row">
+					<th scope="row">
+						<?php _e( 'Knawat Consumer Secret','dropshipping-woocommerce' ); ?>
+					</th>
+					<td>
+						<input class="mp_consumer_secret regular-text" name="knawat[mp_consumer_secret]" type="text" value="<?php if ( $mp_consumer_secret != '' ) { echo $mp_consumer_secret; } ?>" />
+						<p class="description" id="mp_consumer_secret-description">
+							<?php
+							printf( '%s <a href="https://app.knawat.com/" target="_blank">%s</a>',
+								__('You can get your Knawat Consumer Secret', 'dropshipping-woocommerce' ),
+								__('from here', 'dropshipping-woocommerce' )
+							);
+							?>
+						</p>
+					</td>
+				</tr>
+
+			</tbody>
+		</table>
+		<div class="knawatds_element submit_button">
+		    <input type="hidden" name="knawatds_action" value="knawatds_save_settings" />
+		    <?php wp_nonce_field( 'knawatds_setting_form_nonce_action', 'knawatds_setting_form_nonce' ); ?>
+		    <input type="submit" class="button-primary knawatds_submit_button" style=""  value="<?php esc_attr_e( 'Save Settings', 'dropshipping-woocommerce' ); ?>" />
+		</div>
+	</form>
 </div>
