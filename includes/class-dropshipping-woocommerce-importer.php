@@ -118,10 +118,20 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 				$products = array();
 				if ( 'single' === $this->import_type ) {
+					if( isset( $response->product->status ) && 'failed' == $response->product->status ){
+						$error_message = isset( $response->product->message ) ? $response->product->message : __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' );
+						return array( 'status' => 'fail', 'message' => $error_message );
+					}
 					$products[] = $response->product;
 				}else{
 					$products = $response->products;
 				}
+
+				// Handle errors
+				if( isset( $products->code ) || !is_array( $products ) ){
+					return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
+				}
+
 				// Update Product totals.
 				$this->params['products_total'] = count( $products );
 				if( empty( $products ) ){
