@@ -41,7 +41,10 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_load_custom_knawat_order_filter' ) );
 		add_filter( 'admin_footer_text', array( $this, 'add_dropshipping_woocommerce_credit' ) );
 		add_action( 'woocommerce_admin_order_data_after_order_details', array( $this, 'knawat_dropshipwc_add_knawat_order_status_in_backend' ), 10 );
+		// Display admin notices.
 		add_action( 'admin_notices', array( $this, 'display_notices') );
+		// Start Manual import.
+		add_action( 'admin_post_knawatds_manual_import', array( $this, 'knawat_start_manual_product_import') );
 
 		// Add Knawat Order Status column to order list table
 		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
@@ -83,31 +86,53 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	 * @return void
 	 */
 	function admin_page() {
-		
+
 		?>
 		<div class="wrap">
-		    <h1><?php esc_html_e( 'Knawat Dropshipping', 'dropshipping-woocommerce' ); ?></h1>
-		    <?php
-		    // Set Default Tab to Import.
-		    $tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'settings';
-		    ?>
-		    <div id="poststuff">
-		        <div id="post-body" class="metabox-holder columns-2">
+			<h1><?php esc_html_e( 'Knawat Dropshipping', 'dropshipping-woocommerce' ); ?></h1>
+			<?php
+			// Set Default Tab to Import.
+			$tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'import';
+			$consumer_keys = knawat_dropshipwc_get_consumerkeys();
+			if( empty( $consumer_keys ) ){
+				$tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'settings';
+			}
+			?>
+			<div id="poststuff">
+				<div id="post-body" class="metabox-holder columns-2">
 
-		            <div id="postbox-container-1" class="postbox-container">
-		            	<?php //require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin-sidebar.php'; ?>
-		            </div>
-		            <div id="postbox-container-2" class="postbox-container">
+					<div id="postbox-container-1" class="postbox-container">
+						<?php //require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin-sidebar.php'; ?>
+					</div>
+					<div id="postbox-container-2" class="postbox-container">
 
-		                <div class="dropshipping-woocommerce-page">
-		                	<?php
-		                		require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/dropshipping-woocommerce-admin-page.php';
-			                ?>
-		                	<div style="clear: both"></div>
-		                </div>
-		        	</div>
-		        
-		    </div>
+						<h1 class="nav-tab-wrapper">
+							<a href="<?php echo esc_url( add_query_arg( 'tab', 'import', $this->adminpage_url ) ); ?>" class="nav-tab <?php if ( $tab == 'import' ) { echo 'nav-tab-active'; } ?>">
+								<?php esc_html_e( 'Product Import', 'dropshipping-woocommerce' ); ?>
+							</a>
+
+							<a href="<?php echo esc_url( add_query_arg( 'tab', 'settings', $this->adminpage_url ) ); ?>" class="nav-tab <?php if ( $tab == 'settings' ) { echo 'nav-tab-active'; } ?>">
+								<?php esc_html_e( 'Settings', 'dropshipping-woocommerce' ); ?>
+							</a>
+						</h1>
+
+						<div class="dropshipping-woocommerce-page">
+							<?php
+							if ( 'import' === $tab ) {
+
+								require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin/dropshipping-woocommerce-import.php';
+
+							} elseif ( 'settings' === $tab ) {
+
+								require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin/dropshipping-woocommerce-settings.php';
+
+							}
+							?>
+							<div style="clear: both"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
@@ -311,7 +336,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	/**
 	 * Display notices in admin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function display_notices() {
 		global $knawatdswc_errors, $knawatdswc_success;
@@ -336,6 +361,42 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 			endforeach;
 		}
 
+		if( isset( $_GET['manual_run']) && isset( $_GET['tab'] ) && '1' === $_GET['manual_run'] && 'import' === $_GET['tab'] ){
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Manual import started successfully.','dropshipping-woocommerce' ); ?></p>
+			</div>
+			<?php
+		}
+
+		if( isset( $_GET['manual_run']) && isset( $_GET['tab'] ) && '0' === $_GET['manual_run'] && 'import' === $_GET['tab'] ){
+			?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php _e( 'Something went wrong during start manual import.','dropshipping-woocommerce' ); ?></p>
+			</div>
+			<?php
+		}
+	}
+
+	/**
+	 * Manually Start product import.
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_start_manual_product_import() {
+		if( wp_verify_nonce( $_GET['manual_nonce'], 'knawatds_manual_import_action') ){
+			global $knawatdswc_errors;
+			do_action( 'knawat_dropshipwc_run_product_import' );
+
+			if( empty( $knawatdswc_errors ) ){
+				$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import', 'manual_run' => '1' ), $this->adminpage_url ) );
+				wp_redirect(  $redirect_url );
+				exit();
+			}
+		}
+		$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import', 'manual_run' => '0' ), $this->adminpage_url ) );
+		wp_redirect(  $redirect_url );
+		exit();
 	}
 
 	/**

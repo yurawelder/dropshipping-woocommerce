@@ -8,7 +8,7 @@ $mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr(
 ?>
 <div class="knawat_dropshipwc_settings">
 
-	<h3 class="knawat_setting_bar"><?php esc_attr_e( 'Settings', 'dropshipping-woocommerce' ); ?></h3>
+	<h3><?php esc_attr_e( 'Settings', 'dropshipping-woocommerce' ); ?></h3>
 	<p><?php _e( 'You need a Knawat consumer key and consumer secret for import products into your store from knawat.com','dropshipping-woocommerce' ); ?></p>
 	<form method="post" id="knawatds_setting_form">
 		<table class="form-table">
