@@ -176,7 +176,6 @@ class Knawat_Dropshipping_Woocommerce{
 		if( $this->is_woocommerce_activated() ){
 			// API
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-handshake.php';
-			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-rest-controller.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-importer.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-background-process.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-async-request.php';
