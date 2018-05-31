@@ -154,6 +154,7 @@ class Knawat_Dropshipping_Woocommerce{
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-shipment-tracking.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-orders.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-admin-dashboard.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-mp-orders.php';
 		}
 		/**
 		 * Recommended and required plugins.
@@ -177,8 +178,8 @@ class Knawat_Dropshipping_Woocommerce{
 			// API
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-handshake.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-importer.php';
-			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-background-process.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-async-request.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-background-process.php';
 		}
 	}
 

@@ -3,6 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! class_exists( 'WP_Async_Request', false ) ) {
+	include_once plugin_dir_path( __FILE__ ) . 'lib/wp-background-processing/wp-async-request.php';
+}
+
 if ( ! class_exists( 'WP_Background_Process', false ) ) {
 	include_once plugin_dir_path( __FILE__ ) . 'lib/wp-background-processing/wp-background-process.php';
 }
@@ -47,7 +51,6 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 		if( !empty( $error_log ) ){
 			update_option( $error_option, $error_log );
 		}
-
 
 		if ( $params['is_complete'] ) {
 
