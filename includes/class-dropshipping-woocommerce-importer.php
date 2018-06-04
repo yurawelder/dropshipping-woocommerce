@@ -363,8 +363,22 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 							/*///////////////////////////////////////////*/
 							/////// @TODO: Add MULTILINGUAL SUPPORT ///////
 							/*///////////////////////////////////////////*/
-							$temp_attribute_name = $attribute->name->tr;
-							$temp_attribute_value = $attribute->option->tr;
+							$temp_attribute_name = isset( $attribute->name->en ) ? $attribute->name->en : '';
+							$temp_attribute_value = isset( $attribute->option->en ) ? $attribute->option->en : '';
+
+							// if attribute name is blank then take a chance for TR.
+							if( $temp_attribute_name == '' ){
+								$temp_attribute_name = isset( $attribute->name->tr ) ? $attribute->name->tr : '';
+							}
+							if( $temp_attribute_value == '' ){
+								$temp_attribute_value = isset( $attribute->option->tr ) ? $attribute->option->tr : '';
+							}
+
+							// continue if no attribute name found.
+							if( $temp_attribute_name == '' ){
+								continue;
+							}
+
 							$temp_var_attribute = array();
 							$temp_var_attribute['name'] = $temp_attribute_name;
 							$temp_var_attribute['value'] = array( $temp_attribute_value );
