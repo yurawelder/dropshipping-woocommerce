@@ -11,8 +11,8 @@ To disclose a security issue to our team, [please submit a report here](https://
 ## Support
 This repository is not suitable for support. Please don't use our issue tracker for support requests, but for core Knawat dropshipping plugin issues only. Support can take place through the appropriate channels:
 
-* [Knawat support portal](https://help.knawat.com/hc/en-us/requests/new/).
-* [Our community forum on wp.org](https://wordpress.org/support/plugin/dropshipping-woocommerce/) which is available for all WooCommerce users.
+* The [Knawat support portal](https://help.knawat.com/hc/en-us/requests/new/) is available for customers with paid membership.
+* [Our community forum on wp.org](https://wordpress.org/support/plugin/dropshipping-woocommerce/) which is available for all Knawat users.
 
 Support requests in issues on this repository will be closed on sight.
 
