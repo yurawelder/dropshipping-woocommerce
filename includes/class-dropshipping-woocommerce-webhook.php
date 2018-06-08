@@ -45,21 +45,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 	 */
 	function add_new_topic_hooks( $topic_hooks ) {
 		// Array that has the topic as resource.event with arrays of actions that call that topic.
-		$new_hooks = array(
-			'order.knawatcreated' => array(
-				'knawat_order_created', 
-			),
-			'order.knawatupdated' => array(
-				'knawat_order_updated', 
-			),
-			'order.knawatdeleted' => array(
-				'knawat_order_deleted', 
-			),
-			'order.knawatrestored' => array(
-				'knawat_order_restored', 
-			),
-		);
-
 		$dropshippers = knawat_dropshipwc_get_dropshippers();
 		$dropshipper_hooks = array();
 		foreach ($dropshippers as $key => $value) {
@@ -84,8 +69,7 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 			$dropshipper_hooks = array_merge( $dropshipper_hooks, $dropshipper_temp_hooks );
 		}
 
-		$new_hooks = array_merge( $new_hooks, $dropshipper_hooks );
-		return array_merge( $topic_hooks, $new_hooks );
+		return array_merge( $topic_hooks, $dropshipper_hooks );
 	}
 
 	/**
@@ -97,7 +81,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 	 */
 	function add_new_webhook_events( $events ) {
 		// new resource
-		$new_events = array( 'knawatcreated', 'knawatupdated', 'knawatdeleted', 'knawatrestored' );
 		$dropshippers = knawat_dropshipwc_get_dropshippers();
 		$dropshipper_events = array();
 		foreach ($dropshippers as $key => $value) {
@@ -107,8 +90,7 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 			$dropshipper_temp_events = array( $key.'_knawatcreated', $key.'_knawatupdated', $key.'_knawatdeleted', $key.'_knawatrestored' );
 			$dropshipper_events = array_merge( $dropshipper_events, $dropshipper_temp_events );
 		}
-		$new_events = array_merge( $new_events, $dropshipper_events );
-		return array_merge( $events, $new_events );
+		return array_merge( $events, $dropshipper_events );
 	}
 
 	/**
@@ -120,12 +102,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 	 */
 	function add_new_webhook_topics( $topics ) {
 		// New topic array to add to the list, must match hooks being created.
-		$new_topics = array( 
-			'order.knawatcreated' => __( 'Knawat Order created', 'dropshipping-woocommerce' ),
-			'order.knawatupdated' => __( 'Knawat Order updated', 'dropshipping-woocommerce' ),
-			'order.knawatdeleted' => __( 'Knawat Order deleted', 'dropshipping-woocommerce' ),
-			'order.knawatrestored' => __( 'Knawat Order restored', 'dropshipping-woocommerce' ),
-		);
 		$dropshippers = knawat_dropshipwc_get_dropshippers();
 		$dropshipper_topics = array();
 		foreach ( $dropshippers as $key => $value ) {
@@ -138,14 +114,13 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 			);
 			$dropshipper_topics = array_merge( $dropshipper_topics, $dropshipper_temp_topics );
 		}
-		$new_topics = array_merge( $new_topics, $dropshipper_topics );
-		return array_merge( $topics, $new_topics );
+		return array_merge( $topics, $dropshipper_topics );
 	}
 
 
 	/**
 	 * knawat_order_created_updated_callback will run on order create/update.
-	 * if it has knawat product as one of the items, it will fire off the action `knawat_order_created`
+	 * if it is knawat local DS order then related action get fired.
 	 * 
 	 * @param  int    $order_id    The ID of the order that was just created.
 	 *
@@ -185,19 +160,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 					}else{
 						do_action( $knawat_ds.'_knawat_order_updated', $order_id );
 					}
-				}else{
-					if( $current_action == 'woocommerce_process_shop_order_meta' && $resource_created ){
-						do_action( 'knawat_order_created', $order_id );
-
-					}elseif( $current_action == 'woocommerce_update_order' ){
-						do_action( 'knawat_order_updated', $order_id );
-
-					}elseif( $current_action == 'woocommerce_new_order' ){
-						do_action( 'knawat_order_created', $order_id );
-
-					}else{
-						do_action( 'knawat_order_updated', $order_id );
-					}
 				}
 			}
 		}
@@ -205,7 +167,7 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 
 	/**
 	 * knawat_order_created_callback will run on order create.
-	 * if it has knawat product as one of the items, it will fire off the action `knawat_order_created`
+	 * if it is knawat local DS order then related action get fired.
 	 * 
 	 * @param  int    $order_id    The ID of the order that was just created.
 	 *
@@ -225,8 +187,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 				$knawat_ds = $this->knawat_is_order_local_ds( $order_id );
 				if( $knawat_ds != '' ){
 					do_action( $knawat_ds.'_knawat_order_created', $order_id, $posted_data, $order );
-				}else{
-					do_action( 'knawat_order_created', $order_id, $posted_data, $order );
 				}
 			}
 		}
@@ -234,7 +194,7 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 
 	/**
 	 * knawat_order_deleted_callback will run on order delete.
-	 * if it has knawat product as one of the items, it will fire off the action `knawat_order_deleted`
+	 * if it is knawat local DS order then related action get fired.
 	 * 
 	 * @param  int    $order_id    The ID of the order that was just deleted.
 	 *
@@ -254,8 +214,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 				$knawat_ds = $this->knawat_is_order_local_ds( $order_id );
 				if( $knawat_ds != '' ){
 					do_action( $knawat_ds.'_knawat_order_deleted', $order_id );
-				}else{
-					do_action( 'knawat_order_deleted', $order_id );
 				}
 			}
 		}
@@ -263,7 +221,7 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 
 	/**
 	 * knawat_order_restored_callback will run on order restore.
-	 * if it has knawat product as one of the items, it will fire off the action `knawat_order_restored`
+	 * if it is knawat local DS order then related action get fired.
 	 * 
 	 * @param  int    $order_id    The ID of the order that was just restored.
 	 *
@@ -283,8 +241,6 @@ class Knawat_Dropshipping_Woocommerce_Webhook {
 				$knawat_ds = $this->knawat_is_order_local_ds( $order_id );
 				if( $knawat_ds != '' ){
 					do_action( $knawat_ds.'_knawat_order_restored', $order_id );
-				}else{
-					do_action( 'knawat_order_restored', $order_id );
 				}
 			}
 		}
