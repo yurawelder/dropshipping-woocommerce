@@ -56,6 +56,9 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		// Add & Save Product Variation Dropshipper and Quantity
 		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'knawat_dropshipwc_add_dropshipper_field' ), 10, 3 );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'knawat_dropshipwc_save_dropshipper_field' ), 10, 2 );
+
+		// Handle Cron Schedule for existing users.
+		add_action( 'admin_init', array( $this, 'knawat_dropshipwc_maybe_update' ) );
 	}
 
 	/**
@@ -582,6 +585,23 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		if( isset( $_POST['localds_stock'][$variation_id] ) ){
 			$localds_stock = isset( $_POST['localds_stock'][$variation_id] ) ? absint( $_POST['localds_stock'][$variation_id] ) : 0;
 			update_post_meta( $variation_id, '_localds_stock', $localds_stock );
+		}
+	}
+
+	/**
+	 * Check if update actions needed and perform if needed
+	 *
+	 * @return void
+	 */
+	public function knawat_dropshipwc_maybe_update(){
+		$installed_version = get_option( 'knawat_dropwc_version', '1.2.0' );
+
+		if ( version_compare( $installed_version, KNAWAT_DROPWC_VERSION, '<' ) ) {
+			if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
+				// Add Hourly Scheduled import.
+				wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+			}
+			update_option( 'knawat_dropwc_version', KNAWAT_DROPWC_VERSION );
 		}
 	}
 }
