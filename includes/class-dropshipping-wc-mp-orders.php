@@ -58,6 +58,9 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		if( !empty( $order ) ){
 			$is_knawat = get_post_meta( $order_id, '_knawat_order', true );
 			if( 1 == $is_knawat ){
+				if( knawat_dropshipwc_is_order_local_ds( $order_id ) ){
+					return;
+				}
 				$korder_id = get_post_meta( $order_id, '_knawat_order_id', true );
 				if( $korder_id != '' ){
 
@@ -103,7 +106,9 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		if( !empty( $order ) ){
 			$is_knawat = get_post_meta( $order_id, '_knawat_order', true );
 			if( 1 == $is_knawat ){
-
+				if( knawat_dropshipwc_is_order_local_ds( $order_id ) ){
+					return;
+				}
 				$new_order_json = $this->knawat_format_order( $order_id );
 				if( $new_order_json ){
 					$this->mp_api = new Knawat_Dropshipping_Woocommerce_API();

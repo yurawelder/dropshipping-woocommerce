@@ -339,3 +339,20 @@ function knawat_dropshipwc_get_activated_plugins(){
 
 	return $active_plugins;
 }
+
+/**
+ * Check if order is for knawat local DS.
+ *
+ * @param  int    $order_id    The ID of the order
+ *
+ * @return string|bool
+ */
+function knawat_dropshipwc_is_order_local_ds( $order_id ){
+	if( empty( $order_id ) ){ return false; }
+	$knawat_order_ds = get_post_meta( $order_id, '_knawat_order_ds', true );
+	$dropshippers = knawat_dropshipwc_get_dropshippers();
+	if( !empty( $knawat_order_ds ) && isset( $dropshippers[$knawat_order_ds] ) ){
+		return true;
+	}
+	return false;
+}
