@@ -256,6 +256,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		$knawat_options = knawat_dropshipwc_get_options();
 		$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : '';
 		if( 'invalid' === $token_status ){
+			if( ( isset( $_GET['page'] ) && 'knawat_dropship' === sanitize_text_field( $_GET['page'] ) ) && ( isset( $_GET['tab'] ) && 'settings' === sanitize_text_field( $_GET['tab'] ) ) ){
+				return;
+			}
 			global $knawat_dropshipwc, $knawatdswc_warnings;
 			$knawatdswc_warnings[] = sprintf( '%s <a href="' . esc_url( add_query_arg( 'tab', 'settings', $knawat_dropshipwc->admin->adminpage_url ) ) . '" >%s</a>',
 										__('Your connection with knawat.com has been disconnected. Please check and verify your knawat consumer keys from', 'dropshipping-woocommerce' ),
