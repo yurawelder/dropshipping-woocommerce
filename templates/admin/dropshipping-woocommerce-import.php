@@ -14,6 +14,8 @@ if( empty( $consumer_keys ) ){
 	global $wpdb;
 	$batch_query = "SELECT * FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' ORDER BY option_id ASC LIMIT 1";
 	$batches = $wpdb->get_results( $batch_query );
+	$knawat_options = knawat_dropshipwc_get_options();
+	$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : 'invalid';
 	?>
 	<div class="knawat_dropshipwc_import">
 
@@ -30,11 +32,22 @@ if( empty( $consumer_keys ) ){
 					<td>
 						<?php
 						if( empty( $batches ) ){
-							?>
-							<a class="button button-primary" href="<?php echo wp_nonce_url( admin_url('admin-post.php?action=knawatds_manual_import' ), 'knawatds_manual_import_action', 'manual_nonce' ); ?>">
-								<?php esc_html_e( 'Start Import', 'dropshipping-woocommerce' ); ?>
-							</a>
-							<?php
+							if( 'valid' === $token_status ){
+								?>
+								<a class="button button-primary" href="<?php echo wp_nonce_url( admin_url('admin-post.php?action=knawatds_manual_import' ), 'knawatds_manual_import_action', 'manual_nonce' ); ?>">
+									<?php esc_html_e( 'Start Import', 'dropshipping-woocommerce' ); ?>
+								</a>
+								<?php
+							}else{
+								?>
+								<a class="button button-primary" disabled="disabled">
+									<?php esc_html_e( 'Start Import', 'dropshipping-woocommerce' ); ?>
+								</a>
+								<p class="description">
+									<?php _e( 'You\'re not connected to a knawat.com, please make a connection for start import.', 'dropshipping-woocommerce' ); ?>
+								</p>
+								<?php
+							}
 						}else{
 							$imported = $updated = $failed = 0;
 							$batch = isset( $batches[0]->option_value ) ? maybe_unserialize( $batches[0]->option_value ) : array();

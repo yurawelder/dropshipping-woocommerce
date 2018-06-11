@@ -27,7 +27,7 @@ class Knawat_Dropshipping_Woocommerce_API {
      * Contains the API url
      * @access protected
      */
-    protected $api_url = 'https://dev.mp.knawat.io/api';
+    protected $api_url = 'http://dev.mp.knawat.io:4040/api';
 
     /**
 	* __construct function.
@@ -56,7 +56,7 @@ class Knawat_Dropshipping_Woocommerce_API {
 			// Consumer Keys.
 			$consumer_keys = knawat_dropshipwc_get_consumerkeys();
 			if( empty( $consumer_keys ) ){
-				return;
+				return false;
 			}
 
 			// post body
@@ -70,15 +70,15 @@ class Knawat_Dropshipping_Woocommerce_API {
 			) );
 
 			if ( is_wp_error( $response ) ) {
-				return;
+				return false;
 			} else {
 				$channel = wp_remote_retrieve_body( $response );
 				if ( is_wp_error( $channel ) ) {
-					return;
+					return false;
 				}
 				$channel = json_decode( $channel );
 				if( !isset( $channel->channel ) ){
-					return;
+					return false;
 				}
 				$channel = $channel->channel;
 				set_transient( 'knawat_mp_access_channel', $channel, 24 * HOUR_IN_SECONDS );

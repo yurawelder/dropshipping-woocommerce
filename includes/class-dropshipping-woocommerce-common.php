@@ -24,6 +24,8 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'admin_init', array( $this, 'handle_knawat_settings_submit' ), 99 );
 		add_action( 'woocommerce_add_to_cart',  array( $this, 'knawat_dropshipwc_add_to_cart' ), 10, 2 );
 		add_action( 'woocommerce_before_single_product', array( $this, 'knawat_dropshipwc_before_single_product' ) );
+		add_action( 'knawat_dropshipwc_validate_access_token', array( $this, 'validate_access_token' ) );
+		add_action( 'admin_init', array( $this, 'maybe_display_access_token_warning' ) );
 	}
 
 	/**
@@ -99,6 +101,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			return;
 		}
 
+		// Validate access token
+		do_action( 'knawat_dropshipwc_validate_access_token' );
+
 		global $wpdb;
 		$count_query = "SELECT count(option_id) as count FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' ORDER BY option_id ASC";
 		$count = $wpdb->get_var( $count_query );
@@ -137,8 +142,8 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			}
 			knawat_dropshipwc_update_options( $current_options );
 
-			// Remove knawat_mp_access_channel transient for re-fetch token
-			delete_transient( 'knawat_mp_access_channel' );
+			// Validate access token on keys.
+			do_action( 'knawat_dropshipwc_validate_access_token' );
 			$knawatdswc_success[] = __( 'Settings has been saved successfully.', 'dropshipping-woocommerce' );
 		}
 	}
@@ -217,6 +222,46 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		$importer = new Knawat_Dropshipping_Woocommerce_Importer( 'single', array( 'sku' => $sku, 'limit' => 1, 'force_update' => $force_update ) );
 		$import = $importer->import();
 		return $import;
+	}
+
+	/**
+    * Validate Access Token
+    *
+    *
+    * @access public
+    * @return string
+    */
+    public function validate_access_token() {
+
+		$current_options = knawat_dropshipwc_get_options();
+		// Remove knawat_mp_access_channel transient for re-fetch token
+		$mp_api = new Knawat_Dropshipping_Woocommerce_API();
+		delete_transient( 'knawat_mp_access_channel' );
+		$token = $mp_api->get_access_token();
+		if( !empty( $token ) ){
+			$current_options['token_status'] = 'valid';
+		}else{
+			$current_options['token_status'] = 'invalid';
+		}
+		knawat_dropshipwc_update_options( $current_options );
+    }
+
+    /**
+	 * Check if access token is not valid and display warning if token is not valid.
+	 *
+	 * @since    2.0.0
+	 * @return 	 void
+	 */
+	public function maybe_display_access_token_warning() {
+		$knawat_options = knawat_dropshipwc_get_options();
+		$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : '';
+		if( 'invalid' === $token_status ){
+			global $knawat_dropshipwc, $knawatdswc_warnings;
+			$knawatdswc_warnings[] = sprintf( '%s <a href="' . esc_url( add_query_arg( 'tab', 'settings', $knawat_dropshipwc->admin->adminpage_url ) ) . '" >%s</a>',
+										__('Your connection with knawat.com has been disconnected. Please check and verify your knawat consumer keys from', 'dropshipping-woocommerce' ),
+										__('<strong>Knawat Dropshipping</strong> > <strong>Settings</strong>.', 'dropshipping-woocommerce' )
+									);
+		}
 	}
 
 }

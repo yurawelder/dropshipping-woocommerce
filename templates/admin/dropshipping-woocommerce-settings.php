@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $knawat_options = knawat_dropshipwc_get_options();
 $mp_consumer_key = isset( $knawat_options['mp_consumer_key'] ) ? esc_attr( $knawat_options['mp_consumer_key'] ) : '';
 $mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr( $knawat_options['mp_consumer_secret'] ) : '';
+$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : 'invalid';
 ?>
 <div class="knawat_dropshipwc_settings">
 
@@ -48,6 +49,36 @@ $mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr(
 						</p>
 					</td>
 				</tr>
+
+				<?php if( $mp_consumer_key !='' && $mp_consumer_secret != '' ){ ?>
+					<tr class="knawat_dropshipwc_row">
+						<th scope="row">
+							<?php _e( 'Knawat Connection status','dropshipping-woocommerce' ); ?>
+						</th>
+						<td>
+							<?php
+							if( 'valid' === $token_status ){
+								?>
+								<p class="connection_wrap success">
+									<span class="dashicons dashicons-yes"></span> <?php _e( 'Connected','dropshipping-woocommerce' ); ?>
+								</p>
+								<?php
+							}else{
+								?>
+								<p class="connection_wrap error">
+									<span class="dashicons dashicons-dismiss"></span> <?php _e( 'Not connected','dropshipping-woocommerce' ); ?>
+								</p>
+								<p class="description">
+									<?php
+									_e('Please verify your knawat consumer keys.', 'dropshipping-woocommerce' );
+									?>
+								</p>
+								<?php
+							}
+							?>
+						</td>
+					</tr>
+				<?php } ?>
 
 			</tbody>
 		</table>

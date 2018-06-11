@@ -342,7 +342,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	 * @since    2.0.0
 	 */
 	public function display_notices() {
-		global $knawatdswc_errors, $knawatdswc_success;
+		global $knawatdswc_errors, $knawatdswc_success, $knawatdswc_warnings;
 
 		if ( ! empty( $knawatdswc_errors ) ) {
 			foreach ( $knawatdswc_errors as $error ) :
@@ -359,6 +359,16 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 			    ?>
 			    <div class="notice notice-success is-dismissible">
 			        <p><?php echo $success; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
+		if ( ! empty( $knawatdswc_warnings ) ) {
+			foreach ( $knawatdswc_warnings as $warning ) :
+			    ?>
+			    <div class="notice notice-warning is-dismissible">
+			        <p><?php echo $warning; ?></p>
 			    </div>
 			    <?php
 			endforeach;
