@@ -59,6 +59,7 @@ class Knawat_Dropshipping_Woocommerce{
 			self::$instance->admin = new Knawat_Dropshipping_Woocommerce_Admin();
 			if( self::$instance->is_woocommerce_activated() ){
 				self::$instance->orders = new Knawat_Dropshipping_Woocommerce_Orders();
+				self::$instance->mp_orders = new Knawat_Dropshipping_WC_MP_Orders();
 			}
 			/**
 			* The code that runs during plugin activation.

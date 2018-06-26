@@ -389,6 +389,22 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 			</div>
 			<?php
 		}
+
+		if ( isset( $_GET['order_sync'] ) ) {
+			if ( '1' === $_GET['order_sync'] ) {
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php esc_attr_e( 'Order(s) has been synchronized successfully.','dropshipping-woocommerce' ); ?></p>
+				</div>
+				<?php
+			} else {
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p><?php esc_attr_e( 'Something went wrong during order synchronization, please try again.','dropshipping-woocommerce' ); ?></p>
+				</div>
+				<?php
+			}
+		}
 	}
 
 	/**

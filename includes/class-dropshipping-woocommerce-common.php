@@ -404,3 +404,17 @@ function knawat_dropshipwc_is_order_local_ds( $order_id ){
 	}
 	return false;
 }
+
+/**
+ * Check if Access token is valid or not.
+ *
+ * @return bool
+ */
+function knawat_dropshipwc_is_access_token_valid(){
+	$knawat_options = knawat_dropshipwc_get_options();
+	$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : '';
+	if( 'valid' === $token_status ){
+		return true;
+	}
+	return false;
+}

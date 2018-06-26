@@ -7,82 +7,85 @@
  * @copyright   Copyright (c) 2018, Knawat
  * @since       1.2.0
  */
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 class Knawat_Dropshipping_Woocommerce_Orders {
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 */
 	public function __construct() {
-        // Create Suborder from front-end checkout
-        add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'knawat_dropshipwc_create_sub_order' ), 10 );
+		// Create Suborder from front-end checkout.
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'knawat_dropshipwc_create_sub_order' ), 10 );
 
-        // Create separate shipping packages for knawat and non-knawat products.
-        add_filter( 'woocommerce_cart_shipping_packages', array( $this, 'knawat_dropshipwc_split_knawat_shipping_packages' ) );
-        // Add item meta into shipping item.
-        add_action( 'woocommerce_checkout_create_order_shipping_item', array( $this, 'knawat_dropshipwc_add_shipping_meta_data' ), 20, 4 );
+		// Create separate shipping packages for knawat and non-knawat products.
+		add_filter( 'woocommerce_cart_shipping_packages', array( $this, 'knawat_dropshipwc_split_knawat_shipping_packages' ) );
+		// Add item meta into shipping item.
+		add_action( 'woocommerce_checkout_create_order_shipping_item', array( $this, 'knawat_dropshipwc_add_shipping_meta_data' ), 20, 4 );
 
-        // hide the item meta on the Order Items table
-        add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'knawat_dropshipwc_hide_order_item_meta' ) );
-        
-        /* Order Table */
-        add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
-        add_action( 'manage_shop_order_posts_custom_column', array( $this, 'knawat_dropshipwc_render_shop_order_columns' ) );
+		// Hide the item meta on the Order Items table.
+		add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'knawat_dropshipwc_hide_order_item_meta' ) );
 
-        /* Order MetaBoxes */
-        add_action( 'add_meta_boxes', array( $this, 'knawat_dropshipwc_add_meta_boxes' ), 30 );
-        
-        /* Display Main orders only */
-        add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_order_filter' ) );
+		/* Order Table */
+		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'knawat_dropshipwc_render_shop_order_columns' ) );
 
-        /* Count status for parent orders only */
-        add_action( 'wp_count_posts', array( $this, 'knawat_dropshipwc_filter_count_orders' ), 10, 3 );
-        add_action( 'admin_head', array( $this, 'knawat_dropshipwc_count_processing_order' ), 5 );
+		/* Order MetaBoxes */
+		add_action( 'add_meta_boxes', array( $this, 'knawat_dropshipwc_add_meta_boxes' ), 30 );
 
-        /* Order Status sync */
-        add_action( 'woocommerce_order_status_changed', array( $this, 'knawat_dropshipwc_order_status_change' ), 10, 3 );
-        add_action( 'woocommerce_order_status_changed', array( $this, 'knawat_dropshipwc_child_order_status_change' ), 99, 3 );
+		/* Display Main orders only */
+		add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_order_filter' ) );
 
-        /* Remove sub orders from WooCommerce reports */
-        add_filter( 'woocommerce_reports_get_order_report_query', array( $this, 'knawat_dropshipwc_admin_order_reports_remove_suborders' ) );
-        
-        /* WooCommerce Status Dashboard Widget */
-        add_filter( 'woocommerce_dashboard_status_widget_top_seller_query', array( $this, 'knawat_dropshipwc_dashboard_status_widget_top_seller_query' ) );
+		/* Count status for parent orders only */
+		add_action( 'wp_count_posts', array( $this, 'knawat_dropshipwc_filter_count_orders' ), 10, 3 );
+		add_action( 'admin_head', array( $this, 'knawat_dropshipwc_count_processing_order' ), 5 );
 
-        /* Order Trash, Untrash and Delete Operations. */
-        add_action( 'wp_trash_post', array( $this, 'knawat_dropshipwc_trash_order' ) );
-        add_action( 'untrash_post', array( $this, 'knawat_dropshipwc_untrash_order' ) );
-        add_action( 'delete_post', array( $this, 'knawat_dropshipwc_delete_order' ) );
+		/* Order Status sync */
+		add_action( 'woocommerce_order_status_changed', array( $this, 'knawat_dropshipwc_order_status_change' ), 10, 3 );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'knawat_dropshipwc_child_order_status_change' ), 99, 3 );
 
-        /* Override customer orders' query */
-        add_filter( 'woocommerce_my_account_my_orders_query', array( $this, 'knawat_dropshipwc_get_customer_main_orders' ) );
+		/* Remove sub orders from WooCommerce reports */
+		add_filter( 'woocommerce_reports_get_order_report_query', array( $this, 'knawat_dropshipwc_admin_order_reports_remove_suborders' ) );
 
-        /* Rest API only list Main orders */
-        add_filter( 'woocommerce_rest_shop_order_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
-        add_filter( 'woocommerce_rest_shop_order_object_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
+		/* WooCommerce Status Dashboard Widget */
+		add_filter( 'woocommerce_dashboard_status_widget_top_seller_query', array( $this, 'knawat_dropshipwc_dashboard_status_widget_top_seller_query' ) );
 
-        /* Add suborders' ID in REST API order response */
-        add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
-        add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
+		/* Order Trash, Untrash and Delete Operations. */
+		add_action( 'wp_trash_post', array( $this, 'knawat_dropshipwc_trash_order' ) );
+		add_action( 'untrash_post', array( $this, 'knawat_dropshipwc_untrash_order' ) );
+		add_action( 'delete_post', array( $this, 'knawat_dropshipwc_delete_order' ) );
 
-        /* Add Local DS in REST API order response */
-        add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
-        add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
+		/* Override customer orders' query */
+		add_filter( 'woocommerce_my_account_my_orders_query', array( $this, 'knawat_dropshipwc_get_customer_main_orders' ) );
 
-        /* Disabled Emails for suborders */
-        $email_ids = array(
-            'new_order',
-            'failed_order',
-            'cancelled_order',
-            'customer_refunded_order',
-            'customer_processing_order',
-            'customer_on_hold_order',
-            'customer_completed_order',
-        );
+		/* Rest API only list Main orders */
+		add_filter( 'woocommerce_rest_shop_order_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
+		add_filter( 'woocommerce_rest_shop_order_object_query', array( $this, 'knawat_dropshipwc_rest_shop_order_query' ), 10, 2 );
+
+		/* Add suborders' ID in REST API order response */
+		add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_suborders_api' ), 10, 3 );
+
+		/* Add Local DS in REST API order response */
+		add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'knawat_dropshipwc_add_localds_api' ), 20, 3 );
+
+		/* Disabled Emails for suborders */
+		$email_ids = array(
+			'new_order',
+			'failed_order',
+			'cancelled_order',
+			'customer_refunded_order',
+			'customer_processing_order',
+			'customer_on_hold_order',
+			'customer_completed_order',
+		);
 
         foreach( $email_ids as $email_id ){
             add_filter( 'woocommerce_email_enabled_' . $email_id, array( $this, 'knawat_dropshipwc_disable_emails' ),10, 2 );
