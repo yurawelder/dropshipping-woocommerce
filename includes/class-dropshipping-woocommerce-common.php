@@ -418,3 +418,16 @@ function knawat_dropshipwc_is_access_token_valid(){
 	}
 	return false;
 }
+
+/**
+ * Log Errors and warning using WooCommerce Logger
+ *
+ * @return void
+ */
+function knawat_dropshipwc_logger( $message, $type = 'error' ){
+	if( function_exists( 'wc_get_logger' ) && $message != '' ){
+		$logger = wc_get_logger();
+		$context = array( 'source' => 'dropshipping-woocommerce' );
+		$logger->log( $type, $message, $context );
+	}
+}

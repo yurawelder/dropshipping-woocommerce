@@ -195,11 +195,11 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 				return $data;
 			}else{
-				error_log( $this->data );
+				knawat_dropshipwc_logger( '[GET_PRODUCTS_FROM_API_ERROR]'.print_r( $this->data, true ) );
 				return array( 'status' => 'fail', 'message' => __( 'Something went wrong during get data from Knawat MP API. Please try again later.', 'dropshipping-woocommerce' ) );
 			}
 		}else{
-			error_log( $this->data );
+			knawat_dropshipwc_logger( '[GET_PRODUCTS_FROM_API_ERROR]'.$this->data->get_error_message() );
 			return array( 'status' => 'fail', 'message' => $this->data->get_error_message() );
 		}
 	}

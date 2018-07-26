@@ -87,6 +87,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 							}
 						} else {
 							// WC log error.
+							knawat_dropshipwc_logger( sprintf( esc_attr__( 'Order synchronize fail. order id: #%d', 'dropshipping-woocommerce' ), $order_id ) );
 							update_post_meta( $order_id, '_knawat_sync_failed', true );
 						}
 					}
@@ -265,7 +266,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 	 * @since    2.0.0
 	 */
 	public function knawat_start_order_fail_sync() {
-		if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['order_fail_nonce'] ) ), 'knawatds_order_fail_sync_action' ) ) {
+		if ( isset( $_GET['order_fail_nonce'] ) && wp_verify_nonce( sanitize_key( $_GET['order_fail_nonce'] ), 'knawatds_order_fail_sync_action' ) ) { // Input var okay.
 			global $knawat_dropshipwc, $knawatdswc_errors;
 			$is_valid = knawat_dropshipwc_is_access_token_valid();
 			if ( $is_valid ) {
