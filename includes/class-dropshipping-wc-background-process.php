@@ -71,6 +71,9 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 			// update option on import finish.
 			update_option( 'knawat_full_import', 'done', false );
 			update_option( 'knawat_last_imported', time(), false );
+			// Logs import data
+			knawat_dropshipwc_logger( '[IMPORT_STATS_FINAL]'.print_r( $item, true ), 'info' );
+
 			// Return false to complete background import.
 			return false;
 
