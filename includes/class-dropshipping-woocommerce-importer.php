@@ -238,70 +238,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			$new_product['name'] = isset( $product->name->$default_lang->text ) ? sanitize_text_field( $product->name->$default_lang->text ) : '';
 			$new_product['description'] = isset( $product->description->$default_lang->text ) ? sanitize_textarea_field( $product->description->$default_lang->text ) : '';
 
-			$categories = array();
-			if( isset( $product->categories ) && !empty( $product->categories ) ){
-				foreach ( $product->categories as $category ) {
-					if( isset( $category->name->$default_lang ) ){
-						$categories[] = str_replace( ' / ', '>', sanitize_text_field( $category->name->$default_lang ) );
-					}
-				}
-			}
-
-			if( $active_plugins['qtranslate-x'] && !empty( $active_langs ) ){
-
-				$new_product['name'] = '';
-				$new_product['description'] = '';
-				$categories = array();
-
-				foreach ( $active_langs as $active_lang ) {
-					if( isset( $product->name->$active_lang->text ) ){
-						$new_product['name'] .= '[:'.$active_lang.']'.$product->name->$active_lang->text;
-					}
-					if( isset( $product->description->$active_lang->text ) ){
-						$new_product['description'] .= '[:'.$active_lang.']'.$product->description->$active_lang->text;
-					}
-				}
-				if( $new_product['name'] != ''){
-					$new_product['name'] .= '[:]';
-				}
-				if( $new_product['description'] != ''){
-					$new_product['description'] .= '[:]';
-				}
-
-				if( isset( $product->categories ) && !empty( $product->categories ) ){
-					foreach ( $product->categories as $category ) {
-
-						if( !empty( $category->name ) ){
-							foreach ( $category->name as $key => $value ) {
-								$category->name->$key = explode( ' / ', $value );
-							}
-						}
-
-						$cat_name = array();
-						foreach ( $active_langs as $active_lang ) {
-							if( isset( $category->name->$active_lang ) && !empty( $category->name->$active_lang ) ) {
-								foreach ( $category->name->$active_lang as $key => $value ) {
-									if( isset( $cat_name[$key] ) ){
-										$cat_name[$key] .= '[:'.$active_lang.']'.$value;
-									}else{
-										$cat_name[$key] = '[:'.$active_lang.']'.$value;
-									}
-								}
-							}
-						}
-						$cat_name = implode( '[:]>', $cat_name );
-						if( $cat_name != ''){
-							$cat_name .= '[:]';
-						}
-						$categories[] = $cat_name;
-					}
-				}
-			}
-
 			$new_product['short_description'] = $new_product['description'];
-
-			// Formating Category data
-			$new_product['category_ids'] = $this->parse_categories_field( $categories );
 
 			// Added Meta Data.
 			$new_product['meta_data'] = array();
@@ -355,7 +292,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 						$temp_variant['manage_stock'] = true;
 					}
 					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
-					$temp_variant['weight'] = $this->parse_stock_quantity_field( $variation->weight );
+					$temp_variant['weight'] = wc_format_decimal( $variation->weight );
 					$temp_variant['meta_data'][] = array( 'key' => '_knawat_cost', 'value' => wc_format_decimal( $variation->cost_price ) );
 
 					if( isset( $variation->attributes ) && !empty( $variation->attributes ) ){
@@ -412,56 +349,6 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 		}
 		$new_product['variations'] = $variations;
 		return $new_product;
-	}
-
-	/**
-	 * Parse a category field from JSON and get ID of categories based on the Name.
-	 * subcategories are "parent > subcategory".
-	 *
-	 * @param  Array Category name Array.
-	 * @return array of category ids.
-	 */
-	function parse_categories_field( $value ) {
-		if ( empty( $value ) ) {
-			return array();
-		}
-		$row_terms = $value;
-		$categories = array();
-
-		foreach ( $row_terms as $row_term ) {
-			$parent = null;
-			$_terms = array_map( 'trim', explode( '>', $row_term ) );
-			$total  = count( $_terms );
-
-			foreach ( $_terms as $index => $_term ) {
-				// Check if category exists. Parent must be empty string or null if doesn't exists.
-				// @codingStandardsIgnoreStart
-				$term = term_exists( $_term, 'product_cat', $parent );
-				// @codingStandardsIgnoreEnd
-
-				if ( is_array( $term ) ) {
-					$term_id = $term['term_id'];
-				} else {
-					$term = wp_insert_term( $_term, 'product_cat', array( 'parent' => intval( $parent ) ) );
-
-					if ( is_wp_error( $term ) ) {
-						break; // We cannot continue if the term cannot be inserted.
-					}
-
-					$term_id = $term['term_id'];
-				}
-
-				// Only requires assign the last category.
-				if ( ( 1 + $index ) === $total ) {
-					$categories[] = $term_id;
-				} else {
-					// Store parent to be able to insert or query categories based in parent ID.
-					$parent = $term_id;
-				}
-			}
-		}
-
-		return $categories;
 	}
 
 	/**
