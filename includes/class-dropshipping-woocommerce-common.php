@@ -116,7 +116,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		}
 
 		$data = array();
-		$data['limit'] = 5;
+		$data['limit'] = 10;
 		$import_process = new Knawat_Dropshipping_WC_Background();
 		$import_process->push_to_queue( $data );
 		$import_process->save()->dispatch();
