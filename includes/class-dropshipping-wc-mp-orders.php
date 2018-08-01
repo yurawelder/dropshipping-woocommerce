@@ -187,6 +187,19 @@ class Knawat_Dropshipping_WC_MP_Orders {
 			}
 		}
 
+		// Set Payment Method.
+		$payment_method = isset( $order['payment_method'] ) ? sanitize_text_field( $order['payment_method'] ) : '';
+		$payment_method_title = isset( $order['payment_method_title'] ) ? sanitize_text_field( $order['payment_method_title'] ) : '';
+		if( $payment_method != ''){
+			if( $payment_method_title != ''){
+				$payment_method .= ' ('.$payment_method_title.')';
+			}
+		} elseif( $payment_method_title != ''){
+			$payment_method = $payment_method_title;
+		}
+
+		$new_order['payment_method'] = $payment_method;
+
 		// Add Email and phone into Shipping.
 		$new_order['shipping']['email'] = $new_order['billing']['email'];
 		$new_order['shipping']['phone'] = $new_order['billing']['phone'];
