@@ -260,7 +260,8 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 				}
 			}
 
-			$new_product['short_description'] = $new_product['description'];
+			//$new_product['short_description'] = $new_product['description'];
+			$new_product['short_description'] = '';
 
 			// Added Meta Data.
 			$new_product['meta_data'] = array();
