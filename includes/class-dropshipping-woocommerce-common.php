@@ -26,6 +26,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'woocommerce_before_single_product', array( $this, 'knawat_dropshipwc_before_single_product' ) );
 		add_action( 'knawat_dropshipwc_validate_access_token', array( $this, 'validate_access_token' ) );
 		add_action( 'admin_init', array( $this, 'maybe_display_access_token_warning' ) );
+		add_action( 'wp_ajax_knawat_dismiss_admin_notice', array( $this, 'knawat_dismiss_admin_notice' ) );
 	}
 
 	/**
@@ -265,6 +266,40 @@ class Knawat_Dropshipping_Woocommerce_Common {
 										__('<strong>Knawat Dropshipping</strong> > <strong>Settings</strong>.', 'dropshipping-woocommerce' )
 									);
 		}
+	}
+
+	/**
+	 * Dismiss Admin notice for Forever
+	 *
+	 * @since    1.0.0
+	 * @return 	 boolean
+	 */
+	public function knawat_dismiss_admin_notice() {
+		$notice_type = sanitize_text_field( $_POST['notice_type'] );
+		if ( $notice_type != '' ) {
+			$notice_type = sanitize_key( $notice_type );
+			check_ajax_referer( 'kdropshipping_nonce', 'nonce' );
+			update_option( $notice_type, 'dismissed' );
+		}
+		wp_die();
+	}
+
+	/**
+	 * Dismiss Admin notice for Forever
+	 *
+	 * @since    1.0.0
+	 * @return 	 boolean
+	 */
+	public function is_admin_notice_active( $notice_type ) {
+		if ( empty( $notice_type ) ) {
+			return false;
+		}
+		$notice_type = sanitize_key( $notice_type );
+		$is_active = get_option( $notice_type, false );
+		if( $is_active ){
+			return false;
+		}
+		return true;
 	}
 
 }

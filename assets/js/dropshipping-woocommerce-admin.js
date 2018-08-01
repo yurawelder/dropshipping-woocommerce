@@ -18,6 +18,22 @@ jQuery( document).ready( function(){
 	});
 });
 
+jQuery( document).ready( function(){
+	jQuery(".knawat_dismiss_notice").on("click", function(e){
+		e.preventDefault();
+		var notice_type = jQuery(this).data('noticetype');
+		jQuery(this).parent().parent().remove();
+
+		var data = {
+			'action': 'knawat_dismiss_admin_notice',
+			'notice_type': notice_type,
+			'nonce': kdropshipping_object.nonce
+		};
+
+		jQuery.post(ajaxurl, data);
+	});
+});
+
 function knawat_hide_show_dropshipper_qty( element ){
 	if( jQuery( element ).val() == 'default' ){
 		jQuery( element ).closest( '.woocommerce_variation' ).find( 'p.knawat_dropshipwc_localds_stock' ).hide();

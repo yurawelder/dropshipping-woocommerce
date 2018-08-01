@@ -41,6 +41,8 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_load_custom_knawat_order_filter' ) );
 		add_filter( 'admin_footer_text', array( $this, 'add_dropshipping_woocommerce_credit' ) );
 		add_action( 'woocommerce_admin_order_data_after_order_details', array( $this, 'knawat_dropshipwc_add_knawat_order_status_in_backend' ), 10 );
+		add_action( 'admin_init', array( $this, 'add_default_category_notice' ) );
+
 		// Display admin notices.
 		add_action( 'admin_notices', array( $this, 'display_notices') );
 		// Start Manual import.
@@ -318,6 +320,10 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function enqueue_admin_scripts( $hook ) {
 		$js_dir  = KNAWAT_DROPWC_PLUGIN_URL . 'assets/js/';
 		wp_register_script( 'dropshipping-woocommerce', $js_dir . 'dropshipping-woocommerce-admin.js', array('jquery' ), KNAWAT_DROPWC_VERSION );
+		$params = array(
+			'nonce' => wp_create_nonce('kdropshipping_nonce'),
+		);
+		wp_localize_script( 'dropshipping-woocommerce', 'kdropshipping_object', $params );
 		wp_enqueue_script( 'dropshipping-woocommerce' );
 		
 	}
@@ -628,6 +634,21 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 				wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
 			}
 			update_option( 'knawat_dropwc_version', KNAWAT_DROPWC_VERSION );
+		}
+	}
+
+	/**
+	 * Set notice on Settings page for select default WooCommerce Category.
+	 *
+	 * @since 2.0
+	 * @return void
+	 */
+	public function add_default_category_notice() {
+		global $knawat_dropshipwc, $knawatdswc_warnings;
+		if ( isset( $_GET[ 'page' ] ) && 'knawat_dropship' === sanitize_text_field( $_GET[ 'page' ] ) && isset( $_GET[ 'tab' ] ) && 'settings' === sanitize_text_field( $_GET[ 'tab' ] ) ) {
+			if( $knawat_dropshipwc->common->is_admin_notice_active('select_default_cat') ){
+				$knawatdswc_warnings[] = sprintf( '%s <a href="#" class="knawat_dismiss_notice" data-noticetype="select_default_cat"> %s</a>', __( 'Before you start importing products, it\'s better to set default category for import Knawat Products. You can set it from <strong>Products > Categories.</strong>  ex: New arrivals, or something else as you want.', 'dropshipping-woocommerce' ), __('Dismiss this notice.', 'dropshipping-woocommerce' ));
+			}
 		}
 	}
 }
