@@ -141,7 +141,7 @@ class Knawat_Merlin {
 
 		add_action( 'admin_init', array( $this, 'redirect' ), 30 );
 		add_action( 'admin_init', array( $this, 'steps' ), 30, 0 );
-		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+		// add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'admin_page' ), 30, 0 );
 		add_action( 'admin_footer', array( $this, 'svg_sprite' ) );
 		add_filter( 'tgmpa_load', array( $this, 'load_tgmpa' ), 10, 1 );
