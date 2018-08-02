@@ -133,6 +133,18 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				if ( knawat_dropshipwc_is_order_local_ds( $order_id ) ) {
 					return;
 				}
+
+				$push_statuses = knawat_dropshipwc_get_push_order_statuses();
+				$payment_method = $order->get_payment_method();
+				$push_status = isset( $push_statuses[$payment_method] ) ? str_replace('wc-', '', $push_statuses[$payment_method] ) : 'processing';
+				$order_status = $order->get_status();
+
+				if( $push_status != $order_status ){
+					// Return as order status is not allowed to push order
+					delete_post_meta( $order_id, '_knawat_sync_failed' );
+					return;
+				}
+
 				$new_order_json = $this->knawat_format_order( $order_id );
 				if ( $new_order_json ) {
 					$this->mp_api = new Knawat_Dropshipping_Woocommerce_API();

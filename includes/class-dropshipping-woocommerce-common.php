@@ -142,6 +142,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			if( isset( $knawatds_options['mp_consumer_secret'] ) ){
 				$current_options['mp_consumer_secret'] = sanitize_text_field( $knawatds_options['mp_consumer_secret'] );
 			}
+			if( isset( $knawatds_options['order_statuses'] ) ){
+				$current_options['order_statuses'] = array_map( 'sanitize_text_field', wp_unslash( $knawatds_options['order_statuses'] ) );
+			}
 			knawat_dropshipwc_update_options( $current_options );
 
 			// Validate access token on keys.
@@ -412,6 +415,20 @@ function knawat_dropshipwc_get_consumerkeys(){
 		$consumer_keys['consumer_secret'] = $knawat_options['mp_consumer_secret'];
 	}
 	return $consumer_keys;
+}
+
+/**
+ * Get Order statuses to push.
+ *
+ * @return array Order statuses
+ */
+function knawat_dropshipwc_get_push_order_statuses(){
+	$order_statuses  = array();
+	$knawat_options = knawat_dropshipwc_get_options();
+	if( isset( $knawat_options['order_statuses'] ) && !empty( $knawat_options['order_statuses'] ) ){
+		$order_statuses = $knawat_options['order_statuses'];
+	}
+	return $order_statuses;
 }
 
 /**
