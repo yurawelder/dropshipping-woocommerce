@@ -304,9 +304,15 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 				if( $product_id && !$this->params['force_update'] ){
 
-					$temp_variant['price'] = wc_format_decimal( $variation->sale_price );
-					$temp_variant['regular_price'] = wc_format_decimal( $variation->market_price );
-					$temp_variant['sale_price'] = wc_format_decimal( $variation->sale_price );
+					if( is_numeric( $variation->sale_price ) ){
+						$temp_variant['price'] = wc_format_decimal( $variation->sale_price );
+					}
+					if( is_numeric( $variation->market_price ) ){
+						$temp_variant['regular_price'] = wc_format_decimal( $variation->market_price );
+					}
+					if( is_numeric( $variation->sale_price ) ){
+						$temp_variant['sale_price'] = wc_format_decimal( $variation->sale_price );
+					}
 					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
 				}else{
 
