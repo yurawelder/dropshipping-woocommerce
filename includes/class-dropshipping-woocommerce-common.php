@@ -116,8 +116,12 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			return false;
 		}
 
+		$product_batch_size = knawat_dropshipwc_get_product_batch_size();
+		if( empty( $product_batch_size ) || $product_batch_size < 0 || $product_batch_size > 1000 ){
+			$product_batch_size = 25;
+		}
 		$data = array();
-		$data['limit'] = 10;
+		$data['limit'] = $product_batch_size;
 		$import_process = new Knawat_Dropshipping_WC_Background();
 		$import_process->push_to_queue( $data );
 		$import_process->save()->dispatch();
@@ -141,6 +145,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			}
 			if( isset( $knawatds_options['mp_consumer_secret'] ) ){
 				$current_options['mp_consumer_secret'] = sanitize_text_field( $knawatds_options['mp_consumer_secret'] );
+			}
+			if( isset( $knawatds_options['product_batch'] ) && is_numeric( $knawatds_options['product_batch'] ) ){
+				$current_options['product_batch'] = sanitize_text_field( $knawatds_options['product_batch'] );
 			}
 			if( isset( $knawatds_options['order_statuses'] ) ){
 				$current_options['order_statuses'] = array_map( 'sanitize_text_field', wp_unslash( $knawatds_options['order_statuses'] ) );
@@ -429,6 +436,20 @@ function knawat_dropshipwc_get_push_order_statuses(){
 		$order_statuses = $knawat_options['order_statuses'];
 	}
 	return $order_statuses;
+}
+
+/**
+ * Get Product Batch Size.
+ *
+ * @return array Order statuses
+ */
+function knawat_dropshipwc_get_product_batch_size(){
+	$product_batch  = 25;
+	$knawat_options = knawat_dropshipwc_get_options();
+	if( isset( $knawat_options['product_batch'] ) && !empty( $knawat_options['product_batch'] ) ){
+		$product_batch = $knawat_options['product_batch'];
+	}
+	return $product_batch;
 }
 
 /**

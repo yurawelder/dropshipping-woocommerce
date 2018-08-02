@@ -6,6 +6,7 @@ $knawat_options = knawat_dropshipwc_get_options();
 $mp_consumer_key = isset( $knawat_options['mp_consumer_key'] ) ? esc_attr( $knawat_options['mp_consumer_key'] ) : '';
 $mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr( $knawat_options['mp_consumer_secret'] ) : '';
 $token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : 'invalid';
+$product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_options['product_batch'] ) : 25;
 ?>
 <div class="knawat_dropshipwc_settings">
 
@@ -50,6 +51,20 @@ $token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_opt
 					</td>
 				</tr>
 
+				<tr class="knawat_dropshipwc_row">
+					<th scope="row">
+						<?php _e( 'Products Batch Size:','dropshipping-woocommerce' ); ?>
+					</th>
+					<td>
+						<input class="product_batch regular-text" name="knawat[product_batch]" type="number" value="<?php echo $product_batch; ?>" min="1" max="1000"/>
+						<p class="description" id="product_batch-description">
+							<?php
+							_e( 'Products batch size for import products from knawat.com', 'dropshipping-woocommerce' );
+							?>
+						</p>
+					</td>
+				</tr>
+
 				<?php if( $mp_consumer_key !='' && $mp_consumer_secret != '' ){ ?>
 					<tr class="knawat_dropshipwc_row">
 						<th scope="row">
@@ -88,7 +103,7 @@ $token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_opt
 				}
 				if( !empty( $available_gateways ) && !empty( $order_statuses ) ){
 					?>
-					<tr>
+					<tr class="knawat_dropshipwc_row">
 						<td colspan="2" style="padding-left: 0px;">
 							<strong style="font-size: 1.15em">
 								<?php _e('Order Status for send order to knawat.com', 'dropshipping-woocommerce' ); ?>
@@ -101,7 +116,7 @@ $token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_opt
 					<?php
 					foreach ( $available_gateways as $key => $gateway) {
 						?>
-						<tr>
+						<tr class="knawat_dropshipwc_row">
 							<th><?php echo $gateway->method_title ?></th>
 							<td>
 								<select name="knawat[order_statuses][<?php echo $key; ?>]">

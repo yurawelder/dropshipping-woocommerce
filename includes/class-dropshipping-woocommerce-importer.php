@@ -66,13 +66,13 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
     public function __construct( $import_type = 'full', $params = array() ) {
 
 		$default_args = array(
-			'import_id'       	=> 0, // Import_ID
-			'limit'           	=> 10, // Limit for Fetch Products
-			'page'            	=> 1, // Max lines to read.
-			'product_index'     => -1, // Column mapping. csv_heading => schema_heading.
-			'force_update' 	 	=> false, // Whether to update existing items.
+			'import_id'       	=> 0,  // Import_ID
+			'limit'           	=> 25, // Limit for Fetch Products
+			'page'            	=> 1,  // Page Number
+			'product_index'     => -1, // product index needed incase of memory issuee or timeout
+			'force_update' 	 	=> false, // Whether to force update existing items.
 			'prevent_timeouts' 	=> true,  // Check memory and time usage and abort if reaching limit.
-			'is_complete'		=> false,
+			'is_complete'		=> false, // Is Import Complete?
 			'products_total'	=> -1,
 			'imported'			=> 0,
 			'failed'			=> 0,
