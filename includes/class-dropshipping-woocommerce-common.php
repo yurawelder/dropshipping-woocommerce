@@ -26,6 +26,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'woocommerce_before_single_product', array( $this, 'knawat_dropshipwc_before_single_product' ) );
 		add_action( 'knawat_dropshipwc_validate_access_token', array( $this, 'validate_access_token' ) );
 		add_action( 'admin_init', array( $this, 'maybe_display_access_token_warning' ) );
+		// add_action( 'admin_init', array( $this, 'display_knawat_persistent_notices' ) );
 		add_action( 'wp_ajax_knawat_dismiss_admin_notice', array( $this, 'knawat_dismiss_admin_notice' ) );
 	}
 
@@ -302,6 +303,29 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		return true;
 	}
 
+	/**
+	 * Display persistent notices.
+	 *
+	 * @since    2.0.0
+	 * @return 	 void
+	 */
+	public function display_knawat_persistent_notices( $remove = true ) {
+		$persistent_notices = get_transient('knawat_persistent_notices');
+		if( !empty( $persistent_notices ) ){
+			global $knawatdswc_errors, $knawatdswc_success, $knawatdswc_warnings;
+			if( isset( $persistent_notices['errors'] ) && is_array( $persistent_notices['errors'] ) ){
+				$knawatdswc_errors = array_merge( $knawatdswc_errors, $persistent_notices['errors'] );
+			}
+			if( isset( $persistent_notices['success'] ) && is_array( $persistent_notices['success'] ) ){
+				$knawatdswc_success = array_merge( $knawatdswc_success, $persistent_notices['success'] );
+			}
+			if( isset( $persistent_notices['warnings'] ) && is_array( $persistent_notices['warnings'] ) ){
+				$knawatdswc_warnings = array_merge( $knawatdswc_warnings, $persistent_notices['warnings'] );
+			}
+		}
+		delete_transient( 'knawat_persistent_notices' );
+	}
+
 }
 
 /*
@@ -464,5 +488,16 @@ function knawat_dropshipwc_logger( $message, $type = 'error' ){
 		$logger = wc_get_logger();
 		$context = array( 'source' => 'dropshipping-woocommerce' );
 		$logger->log( $type, $message, $context );
+	}
+}
+
+/**
+ * Knawat Set persistent notices (which is used to show after page redirect).
+ *
+ * @return void
+ */
+function knawat_set_notices( $messages ){
+	if( !empty( $messages ) ){
+		set_transient( 'knawat_persistent_notices', $messages, 5 * MINUTE_IN_SECONDS );
 	}
 }
