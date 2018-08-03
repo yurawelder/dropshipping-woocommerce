@@ -237,8 +237,8 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			if( isset( $product->variations ) && !empty( $product->variations ) ){
 				$new_product['type'] = 'variable';
 			}
-			$new_product['name'] = isset( $product->name->$default_lang->text ) ? sanitize_text_field( $product->name->$default_lang->text ) : '';
-			$new_product['description'] = isset( $product->description->$default_lang->text ) ? sanitize_textarea_field( $product->description->$default_lang->text ) : '';
+			$new_product['name'] = isset( $product->name->$default_lang ) ? sanitize_text_field( $product->name->$default_lang ) : '';
+			$new_product['description'] = isset( $product->description->$default_lang ) ? sanitize_textarea_field( $product->description->$default_lang ) : '';
 
 			if( $active_plugins['qtranslate-x'] && !empty( $active_langs ) ){
 
@@ -247,11 +247,11 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 				$categories = array();
 
 				foreach ( $active_langs as $active_lang ) {
-					if( isset( $product->name->$active_lang->text ) ){
-						$new_product['name'] .= '[:'.$active_lang.']'.$product->name->$active_lang->text;
+					if( isset( $product->name->$active_lang ) ){
+						$new_product['name'] .= '[:'.$active_lang.']'.$product->name->$active_lang;
 					}
-					if( isset( $product->description->$active_lang->text ) ){
-						$new_product['description'] .= '[:'.$active_lang.']'.$product->description->$active_lang->text;
+					if( isset( $product->description->$active_lang ) ){
+						$new_product['description'] .= '[:'.$active_lang.']'.$product->description->$active_lang;
 					}
 				}
 				if( $new_product['name'] != ''){
