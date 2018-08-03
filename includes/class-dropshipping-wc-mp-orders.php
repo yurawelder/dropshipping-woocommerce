@@ -37,7 +37,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 
 		// Create/Update Order.
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'knawatds_order_created_updated' ), 99 );
-		/* add_action( 'woocommerce_update_order', array( $this, 'knawatds_order_created_updated' ), 99 ); */
+		add_action( 'woocommerce_update_order', array( $this, 'knawatds_order_created_updated' ), 99 );
 
 		// Handle a custom meta query var to get orders with the custom meta field.
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', array( $this, 'handle_knawatds_custom_query_var' ), 10, 2 );
