@@ -202,11 +202,14 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		$result  = $controller->get_item( $request );
 		$order   = isset( $result->data ) ? $result->data : array();
 		$order_whitelist_fields = array( 'id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url' );
+		if( !$is_update ){
+			$order_whitelist_fields = array( 'id', 'parent_id', 'number', 'order_key', 'created_via', 'currency', 'discount_total', 'discount_tax', 'shipping_total', 'shipping_tax', 'cart_tax','total','total_tax','prices_include_tax', 'customer_note', 'transaction_id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
+		}
 		$item_whitelist_fields = array( 'id', 'sku' );
 		$new_order = array();
 
-		$search_order  = array( 'line_items', 'pdf_invoice_url' );
-		$replace_order = array( 'items', 'invoice_url' );
+		$search_order  = array( 'line_items', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
+		$replace_order = array( 'items', 'invoice_url', 'invoice_url_rtl' );
 		foreach ( $order as $key => $value ) {
 			if ( in_array( $key, $order_whitelist_fields ) ) {
 
