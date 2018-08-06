@@ -51,6 +51,8 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 		if( !empty( $error_log ) ){
 			update_option( $error_option, $error_log );
 		}
+		// Logs import data
+		knawat_dropshipwc_logger( '[IMPORT_STATS_IMPORTER]'.print_r( $results, true ), 'info' );
 
 		if ( $params['is_complete'] ) {
 
@@ -73,6 +75,7 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 			update_option( 'knawat_last_imported', time(), false );
 			// Logs import data
 			knawat_dropshipwc_logger( '[IMPORT_STATS_FINAL]'.print_r( $item, true ), 'info' );
+			knawat_dropshipwc_logger( '[FAILED_IMPORTS]'.print_r( $error_log, true ) );
 
 			// Return false to complete background import.
 			return false;

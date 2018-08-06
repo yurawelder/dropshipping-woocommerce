@@ -193,8 +193,6 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					$this->params['is_complete'] = false;
 				}
 
-				// Logs import data
-				knawat_dropshipwc_logger( '[IMPORT_STATS_IMPORTER]'.print_r( $data, true ), 'info' );
 				return $data;
 			}else{
 				knawat_dropshipwc_logger( '[GET_PRODUCTS_FROM_API_ERROR]'.print_r( $this->data, true ) );
