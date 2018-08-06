@@ -239,6 +239,16 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		$new_order['payment_method'] = $payment_method;
 
 		// Add Email and phone into Shipping.
+		if( !isset( $new_order['shipping']['first_name'] ) || empty( $new_order['shipping']['first_name'] ) ){
+			$shipping_fields = array( 'first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country', 'email', 'phone' );
+			foreach ($shipping_fields as $shipping_field) {
+				if( !isset( $new_order['shipping'][$shipping_field] ) || empty( $new_order['shipping'][$shipping_field] ) ){
+					$new_order['shipping'][$shipping_field] = $new_order['billing'][$shipping_field];
+				}
+			}
+		}
+
+		// Add Email and phone into Shipping.
 		$new_order['shipping']['email'] = $new_order['billing']['email'];
 		$new_order['shipping']['phone'] = $new_order['billing']['phone'];
 
