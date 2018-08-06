@@ -294,6 +294,6 @@ register_activation_hook( __FILE__, 'knawat_dropshipwc_activate_knawatdswc' );
  */
 function knawat_dropshipwc_deactivate_knawatdswc() {
 	// Remove Hourly Scheduled import
-    wp_clear_scheduled_hook( 'knawat_dropshipwc_run_product_import' );
+	wp_clear_scheduled_hook( 'knawat_dropshipwc_run_product_import' );
 }
 register_deactivation_hook( __FILE__, 'knawat_dropshipwc_deactivate_knawatdswc' );

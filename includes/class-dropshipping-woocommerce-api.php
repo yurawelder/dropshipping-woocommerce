@@ -24,22 +24,38 @@ class Knawat_Dropshipping_Woocommerce_API {
     protected $token;
 
 	/**
+	 * Contains API headers
+	 * @access protected
+	 */
+	protected $headers;
+
+	/**
      * Contains the API url
      * @access protected
      */
     protected $api_url = 'https://dev.mp.knawat.io/api';
 
-    /**
+	/**
 	* __construct function.
 	*
 	* @access public
 	* @return void
 	*/
-    public function __construct() {
+	public function __construct() {
+		// Setup Headers
+		global $wp_version;
+		$woo_version = 'NOT_FOUND';
+		if( defined( 'WC_VERSION') ){
+			$woo_version = WC_VERSION;
+		}
+		$this->headers = array(
+			'User-Agent' 	=> 'Knawat-WP; WordPress/' . $wp_version . '; WooCommerce/' . $woo_version . '; DropShipping/' . KNAWAT_DROPWC_VERSION . '; ' . home_url( '/' ),
+			'Content-Type'	=> 'application/json'
+		);
+
 		// Set API Token
 		$this->token = $this->get_access_token();
-
-    }
+	}
 
     /**
     * Get Access Token
@@ -66,7 +82,8 @@ class Knawat_Dropshipping_Woocommerce_API {
 
 			// Get Store channel
 			$response = wp_remote_post( $this->api_url.'/token', array(
-				'body' => $keydata
+				'body' => $keydata,
+				'headers' => array( 'User-Agent' => $this->headers['User-Agent'] )
 			) );
 
 			if ( is_wp_error( $response ) ) {
@@ -105,11 +122,9 @@ class Knawat_Dropshipping_Woocommerce_API {
 			return new WP_Error( 'token_not_found', __( 'Access token not found for API. Please make sure your store is connected to knawat.com', 'dropshipping-woocommerce' ) );
 		}
 		$url = $this->api_url . '/' . $path;
-
+		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_get( $url, array(
-			'headers' => array(
-				'Authorization' => 'Bearer ' . $this->token,
-			)
+			'headers' => $this->headers
 		) );
 
 		if ( ! is_wp_error( $response ) ) {
@@ -145,13 +160,10 @@ class Knawat_Dropshipping_Woocommerce_API {
 			return new WP_Error( 'token_not_found', __( 'Access token not found for API. Please make sure your store is connected to knawat.com', 'dropshipping-woocommerce' ) );
 		}
 		$url = $this->api_url . '/' . $path;
-
+		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_post( $url, array(
 			'body'	  => $data,
-			'headers' => array(
-				'Authorization' => 'Bearer ' . $this->token,
-				'Content-Type'	=> 'application/json'
-			)
+			'headers' => $this->headers
 		) );
 
 		if ( ! is_wp_error( $response ) ) {
@@ -186,14 +198,11 @@ class Knawat_Dropshipping_Woocommerce_API {
 			return new WP_Error( 'token_not_found', __( 'Access token not found for API. Please make sure your store is connected to knawat.com', 'dropshipping-woocommerce' ) );
 		}
 		$url = $this->api_url . '/' . $path;
-
+		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_request( $url, array(
 			'method'  => 'PUT',
 			'body'	  => $data,
-			'headers' => array(
-				'Authorization' => 'Bearer ' . $this->token,
-				'Content-Type'	=> 'application/json'
-			)
+			'headers' => $this->headers
 		) );
 
 		if ( ! is_wp_error( $response ) ) {
