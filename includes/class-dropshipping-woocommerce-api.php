@@ -123,27 +123,33 @@ class Knawat_Dropshipping_Woocommerce_API {
 		}
 		$url = $this->api_url . '/' . $path;
 		$this->headers['Authorization'] = 'Bearer ' . $this->token;
-		$response = wp_remote_get( $url, array(
-			'headers' => $this->headers
-		) );
 
-		if ( ! is_wp_error( $response ) ) {
-			// In Case return full response
-			if( $return_array ){
-				return $response;
-			}
+		$cache = apply_filters( 'knawat_dropshipwc_mp_api_cache', true, $url, $this->headers, 'GET' );
+		$cache_time = apply_filters( 'knawat_dropshipwc_cache_time', 180 );
+		$transient_name = 'knawat_mp_cache_' . substr( md5( $url . wp_json_encode( $this->headers ) ), 23 );
+		$response = $cache ? get_transient( $transient_name ) : false;
 
-			$response = wp_remote_retrieve_body( $response );
-			if ( !is_wp_error( $response ) ) {
-				// Return json Decoded response.
-				return json_decode( $response );
-			} else {
-				return $response;
+		if ( false === $response ) {
+			$response = wp_remote_get( $url, array(
+				'headers' => $this->headers
+			) );
+
+			if ( ! is_wp_error( $response ) ) {
+				// In Case return full response
+				if( !$return_array ){
+					$response = wp_remote_retrieve_body( $response );
+					if ( !is_wp_error( $response ) ) {
+						// Return json Decoded response.
+						$response = json_decode( $response );
+						if( $cache ){
+							set_transient( $transient_name, $response, $cache_time );
+						}
+					}
+				}
 			}
-		}else{
-			return $response;
 		}
-		return;
+
+		return $response;
     }
 
 
