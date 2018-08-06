@@ -205,7 +205,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		if( !$is_update ){
 			$order_whitelist_fields = array( 'id', 'parent_id', 'number', 'order_key', 'created_via', 'currency', 'discount_total', 'discount_tax', 'shipping_total', 'shipping_tax', 'cart_tax','total','total_tax','prices_include_tax', 'customer_note', 'transaction_id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
 		}
-		$item_whitelist_fields = array( 'id', 'sku' );
+		$item_whitelist_fields = array( 'id', 'sku', 'quantity' );
 		$new_order = array();
 
 		$search_order  = array( 'line_items', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
