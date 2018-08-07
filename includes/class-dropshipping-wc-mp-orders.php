@@ -134,9 +134,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 					return;
 				}
 
-				$push_statuses = knawat_dropshipwc_get_push_order_statuses();
-				$payment_method = $order->get_payment_method();
-				$push_status = isset( $push_statuses[$payment_method] ) ? str_replace('wc-', '', $push_statuses[$payment_method] ) : 'processing';
+				$push_status = 'processing';
 				$order_status = $order->get_status();
 
 				if( $push_status != $order_status ){

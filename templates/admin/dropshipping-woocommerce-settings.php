@@ -95,48 +95,6 @@ $product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_o
 					</tr>
 				<?php } ?>
 
-				<?php
-				$available_gateways = array();
-				$order_statuses = wc_get_order_statuses();
-				if( function_exists('WC') ){
-					$available_gateways = WC()->payment_gateways->get_available_payment_gateways();
-				}
-				if( !empty( $available_gateways ) && !empty( $order_statuses ) ){
-					?>
-					<tr class="knawat_dropshipwc_row">
-						<td colspan="2" style="padding-left: 0px;">
-							<strong style="font-size: 1.15em">
-								<?php _e('Order Status for send order to knawat.com', 'dropshipping-woocommerce' ); ?>
-							</strong>
-							<p>
-								<?php _e('Select payment gateway wise order status for send orders to knawat.com', 'dropshipping-woocommerce' ); ?>
-							</p>
-						</td>
-					</tr>
-					<?php
-					foreach ( $available_gateways as $key => $gateway) {
-						?>
-						<tr class="knawat_dropshipwc_row">
-							<th><?php echo $gateway->method_title ?></th>
-							<td>
-								<select name="knawat[order_statuses][<?php echo $key; ?>]">
-									<?php
-									$selected_value = isset( $knawat_options['order_statuses'][$key] ) ? sanitize_text_field( $knawat_options['order_statuses'][$key] ) : 'wc-processing';
-									foreach ($order_statuses as $skey => $svalue) {
-
-										?>
-										<option value="<?php echo $skey; ?>" <?php selected( $selected_value, $skey ); ?>><?php echo $svalue; ?></option>
-										<?php
-									}
-									?>
-								</select>
-							</td>
-						</tr>
-						<?php
-					}
-				}
-				?>
-
 			</tbody>
 		</table>
 		<div class="knawatds_element submit_button">
