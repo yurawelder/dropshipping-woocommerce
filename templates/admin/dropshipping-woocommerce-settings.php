@@ -11,7 +11,8 @@ $product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_o
 <div class="knawat_dropshipwc_settings">
 
 	<h3><?php esc_attr_e( 'Settings', 'dropshipping-woocommerce' ); ?></h3>
-	<p><?php _e( 'You need a Knawat consumer key and consumer secret for import products into your store from knawat.com','dropshipping-woocommerce' ); ?></p>
+	<p style="margin: 0px;"><strong><?php _e( 'Note: Only orders in Processing status will be sent to Knawat to processs.','dropshipping-woocommerce' ); ?></strong></p>
+	<p style="margin: 0px;"><?php _e( 'You need a Knawat consumer key and consumer secret for import products into your store from knawat.com','dropshipping-woocommerce' ); ?></p>
 	<form method="post" id="knawatds_setting_form">
 		<table class="form-table">
 			<tbody>
