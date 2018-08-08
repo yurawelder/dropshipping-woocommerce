@@ -133,7 +133,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 	 * @since    2.0.0
 	 */
 	public function handle_knawat_settings_submit() {
-		global $knawatdswc_success;
+		global $knawatdswc_success, $knawat_dropshipwc;
 		if ( isset( $_POST['knawatds_action'] ) && $_POST['knawatds_action'] == 'knawatds_save_settings' ) {
 			// Verify nonce.
 			check_admin_referer( 'knawatds_setting_form_nonce_action', 'knawatds_setting_form_nonce' );
@@ -148,6 +148,10 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			}
 			if( isset( $knawatds_options['product_batch'] ) && is_numeric( $knawatds_options['product_batch'] ) ){
 				$current_options['product_batch'] = sanitize_text_field( $knawatds_options['product_batch'] );
+			}
+
+			if( isset( $_POST['order_pull_interval'] ) && is_numeric( $_POST['order_pull_interval'] ) ){
+				$knawat_dropshipwc->cron->knawat_update_pull_order_cron_interval( sanitize_text_field( $_POST['order_pull_interval'] ) );
 			}
 
 			knawat_dropshipwc_update_options( $current_options );

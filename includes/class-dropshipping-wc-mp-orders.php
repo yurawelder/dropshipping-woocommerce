@@ -366,4 +366,63 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		}
 	}
 
+	/**
+	 * Pull Knawat Order related information and store it into WP Order.
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_pull_knawat_order_information( $knawat_order_id ) {
+		if( $knawat_order_id != ''){
+			$mp_api = new Knawat_Dropshipping_Woocommerce_API();
+			$knawat_order = $mp_api->get( 'orders/'.$knawat_order_id );
+			if( isset( $knawat_order->id ) && $knawat_order->id == $knawat_order_id ){
+				// Update Knawat Data here.
+				$this->knawat_update_knawat_order( $knawat_order );
+			}
+		}
+	}
+
+	/**
+	 * Pull Knawat Orders for update WP order
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_pull_knawat_orders( $item ) {
+		if( empty( $item ) ){
+			return false;
+		}
+		$mp_api = new Knawat_Dropshipping_Woocommerce_API();
+		$knawat_orders = $mp_api->get( 'orders/?page='.$item['page'].'&limit='.$item['limit'] );
+		if( empty( $knawat_orders ) ){
+			return false;
+		}
+		// Pull orders and save it here.
+		foreach ( $knawat_orders as $knawat_order ) {
+			$this->knawat_update_knawat_order( $knawat_order );
+		}
+
+		$item['orders_total'] = count( $knawat_orders );
+		if( $item['orders_total'] < $item['limit'] ){
+			$item['is_complete'] = true;
+			return $item;
+		}else{
+			$item['page'] = $item['page'] + 1;
+			$item['is_complete'] = false;
+			return $item;
+		}
+		return false;
+	}
+
+	/**
+	 * Update Knawat Order to WP
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_update_knawat_order( $knawat_order ) {
+		/////////////////////////////////////////////////
+		/////										/////
+		/////  @TODO: ADD ORDER UPDATE MAGIC HERE   /////
+		/////										/////
+		/////////////////////////////////////////////////
+	}
 }

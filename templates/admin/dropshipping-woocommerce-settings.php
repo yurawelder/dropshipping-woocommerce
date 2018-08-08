@@ -66,6 +66,37 @@ $product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_o
 					</td>
 				</tr>
 
+				<tr class="knawat_dropshipwc_row">
+					<th scope="row">
+						<?php _e( 'Orders Synchronization Interval:','dropshipping-woocommerce' ); ?>
+					</th>
+					<?php
+					$current_interval = get_option('knawat_order_pull_cron_interval', 6 * 60 * 60 );
+					$intervals = array(
+						172800 => __( '48 Hours','dropshipping-woocommerce' ),
+						86400 => __( '24 Hours','dropshipping-woocommerce' ),
+						43200 => __( '12 Hours','dropshipping-woocommerce' ),
+						32400 => __( '9 Hours','dropshipping-woocommerce' ),
+						21600 => __( '6 Hours','dropshipping-woocommerce' ),
+						10800 => __( '3 Hours','dropshipping-woocommerce' )
+					);
+					?>
+					<td>
+						<select name="order_pull_interval" required="required">
+						<?php
+						foreach ($intervals as $value => $interval) {
+							echo '<option value="'.$value.'" '.selected( $current_interval, $value, false ).'>'.$interval.'</option>';
+						}
+						?>
+						</select>
+						<p class="description" id="order_pull_interval-description">
+							<?php
+							_e( 'Select interval for synchronization orders with Knawat', 'dropshipping-woocommerce' );
+							?>
+						</p>
+					</td>
+				</tr>
+
 				<?php if( $mp_consumer_key !='' && $mp_consumer_secret != '' ){ ?>
 					<tr class="knawat_dropshipwc_row">
 						<th scope="row">

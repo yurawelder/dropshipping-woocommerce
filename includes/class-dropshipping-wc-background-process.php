@@ -36,6 +36,19 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 	 */
 	protected function task( $item ) {
 
+		if( isset( $item['pull_operation'] ) && sanitize_text_field( $item['pull_operation'] ) == 'pull_order' ){
+			global $knawat_dropshipwc;
+			$pull_results = $knawat_dropshipwc->mp_orders->knawat_pull_knawat_orders( $item );
+			if( !empty( $pull_results ) ){
+				if( $pull_results['is_complete'] ){
+					return false;
+				}else{
+					return $pull_results;
+				}
+			}
+			return false;
+		}
+
 		$importer = new Knawat_Dropshipping_Woocommerce_Importer( 'full', $item );
 		$results = $importer->import();
 		$params = $importer->get_import_params();

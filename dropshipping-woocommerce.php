@@ -56,9 +56,10 @@ class Knawat_Dropshipping_Woocommerce{
 
 			self::$instance->includes();
 			self::$instance->common = new Knawat_Dropshipping_Woocommerce_Common();
-			self::$instance->admin = new Knawat_Dropshipping_Woocommerce_Admin();
+			self::$instance->admin  = new Knawat_Dropshipping_Woocommerce_Admin();
+			self::$instance->cron   = new Knawat_Dropshipping_WC_Cron();
 			if( self::$instance->is_woocommerce_activated() ){
-				self::$instance->orders = new Knawat_Dropshipping_Woocommerce_Orders();
+				self::$instance->orders    = new Knawat_Dropshipping_Woocommerce_Orders();
 				self::$instance->mp_orders = new Knawat_Dropshipping_WC_MP_Orders();
 			}
 			/**
@@ -157,6 +158,7 @@ class Knawat_Dropshipping_Woocommerce{
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-admin-dashboard.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-mp-orders.php';
 		}
+		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-cron.php';
 		/**
 		 * Recommended and required plugins.
 		 */

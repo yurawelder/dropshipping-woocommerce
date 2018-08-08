@@ -61,6 +61,9 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 
 		// Handle Cron Schedule for existing users.
 		add_action( 'admin_init', array( $this, 'knawat_dropshipwc_maybe_update' ) );
+
+		// Pull Order information from knawat.com
+		add_action( 'current_screen', array( $this, 'knawat_dropshipwc_update_knawat_order' ), 99 );
 	}
 
 	/**
@@ -649,6 +652,44 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 			if( $knawat_dropshipwc->common->is_admin_notice_active('select_default_cat') ){
 				$knawatdswc_warnings[] = sprintf( '%s <a href="#" class="knawat_dismiss_notice" data-noticetype="select_default_cat"> %s</a>', __( 'Before you start importing products, it\'s better to set default category for import Knawat Products. You can set it from <strong>Products > Categories.</strong>  ex: New arrivals, or something else as you want.', 'dropshipping-woocommerce' ), __('Dismiss this notice.', 'dropshipping-woocommerce' ));
 			}
+		}
+	}
+
+	/**
+	 * Pull knawat order information from Knawat.com
+	 *
+	 * @since 2.0
+	 * @return void
+	 */
+	public function knawat_dropshipwc_update_knawat_order( $current_screen = '' ){
+		if( $current_screen->base == 'post' && $current_screen->id == 'shop_order' ){
+			$order_id = 0;
+			if ( isset( $_GET['post'] ) ) {
+				$order_id = (int) $_GET['post'];
+			} elseif ( isset( $_POST['post_ID'] ) ) {
+				$order_id = (int) $_POST['post_ID'];
+			}
+
+			if( $order_id > 0 ){
+				$order = wc_get_order( $order_id );
+				if ( empty( $order ) ) {
+					return;
+				}
+				$is_knawat = get_post_meta( $order_id, '_knawat_order', true );
+				$knawat_order_id = get_post_meta( $order_id, '_knawat_order_id', true );
+				if ( 1 == $is_knawat && $knawat_order_id != '' ) {
+					if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) ) {
+						return;
+					}
+					// Async Order Update.
+					$async_request = new Knawat_Dropshipping_WC_Async_Request();
+					$async_request->data( array( 'operation' => 'pull_order', 'knawat_order_id' => $knawat_order_id ) );
+					$temp = $async_request->dispatch();
+				}
+			}
+		} elseif( $current_screen->base == 'edit' && $current_screen->id == 'edit-shop_order'  ){
+			// Fire Pull Order hook.
+			do_action( 'knawat_dropshipwc_run_pull_orders' );
 		}
 	}
 }
