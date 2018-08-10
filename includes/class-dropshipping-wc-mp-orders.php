@@ -215,6 +215,8 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				$new_order[ $key ] = $value;
 			}
 		}
+		// Set Order_ID as a string
+		$new_order['id'] = (string) $new_order['id'];
 
 		if ( isset( $new_order['items'] ) && ! empty( $new_order['items'] ) ) {
 			foreach ( $new_order['items'] as $itemkey => $item ) {
