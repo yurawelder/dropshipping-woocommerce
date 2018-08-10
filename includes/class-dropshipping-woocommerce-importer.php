@@ -149,11 +149,24 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					$variations = $formated_data['variations'];
 					unset( $formated_data['variations'] );
 
+					// Prevent new import for 0 qty products.
+					$total_qty = 0;
+					if( !empty( $variations )){
+						foreach ($variations as $vars) {
+							$total_qty += isset($vars['stock_quantity']) ? $vars['stock_quantity'] : 0;
+						}
+					}
+
 					if( isset( $formated_data['id'] ) && !$this->params['force_update'] ){
 						// Fake it
 						$result = array( 'id' => $formated_data['id'], 'updated' => true );
 					}else{
-						$result = $this->process_item( $formated_data );
+						if( $total_qty > 0 ){
+							$result = $this->process_item( $formated_data );
+						} else {
+							knawat_dropshipwc_logger("[0_QTY_PRODUCT] SKU:".$formated_data['sku']);
+							continue;
+						}
 					}
 					if ( is_wp_error( $result ) ) {
 						$result->add_data( array( 'data' => $formated_data ) );
