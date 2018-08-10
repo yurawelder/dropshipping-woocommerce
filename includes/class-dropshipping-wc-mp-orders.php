@@ -74,6 +74,14 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				$korder_id = get_post_meta( $order_id, '_knawat_order_id', true );
 				if ( $korder_id != '' ) {
 
+					$order_status = $order->get_status();
+					$whilelisted_status = array( 'pending', 'processing', 'cancelled' );
+					if( !in_array( $order_status, $whilelisted_status ) ){
+						// Return as order status is not allowed to push order
+						delete_post_meta( $order_id, '_knawat_sync_failed' ); // Clear
+						return;
+					}
+
 					$update_order_json = $this->knawat_format_order( $order_id, true );
 					if ( $update_order_json ) {
 						$this->mp_api = new Knawat_Dropshipping_Woocommerce_API();
