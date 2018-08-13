@@ -199,9 +199,14 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					}
 				}
 
-				if( $this->params['products_total'] === 0 ){
+				/*if( $this->params['products_total'] === 0 ){
 					$this->params['is_complete'] = true;
 				}elseif( ( $this->params['products_total'] < $this->params['limit'] ) && ( $this->params['products_total'] == ( $this->params['product_index'] + 1 ) ) ){
+					$this->params['is_complete'] = true;
+				}else{
+					$this->params['is_complete'] = false;
+				}*/
+				if( $this->params['products_total'] === 0 ){
 					$this->params['is_complete'] = true;
 				}else{
 					$this->params['is_complete'] = false;
