@@ -71,13 +71,6 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 
 			// Send success.
 			$item = $params;
-			if( $params['products_total'] == ( $params['product_index'] + 1 ) ){
-				$item['page']  = $params['page'] + 1;
-				$item['product_index']  = -1;
-			}else{
-				$item['page']  = $params['page'];
-				$item['product_index']  = $params['product_index'];
-			}
 
 			$item['imported'] += count( $results['imported'] );
 			$item['failed']   += count( $results['failed'] );
