@@ -210,3 +210,8 @@
 .knawat_dropshipwc_row .connection_wrap span.dashicons-dismiss{
 	padding: 1px 0px 1px 1px;
 }
+
+/* Hide Admin Knawat DropShippinh Submenu */
+li#toplevel_page_knawat_dropship ul.wp-submenu{
+	display: none;
+}
