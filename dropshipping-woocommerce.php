@@ -88,14 +88,14 @@ class Knawat_Dropshipping_Woocommerce{
 	 *
 	 * @since 1.0.0
 	 */
-	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
+	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '2.0.0' ); }
 
 	/**
 	 * A dummy magic method to prevent Knawat_Dropshipping_Woocommerce from being unserialized.
 	 *
 	 * @since 1.0.0
 	 */
-	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
+	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '2.0.0' ); }
 	
 	/**
 	 * Setup plugins constants.
@@ -108,7 +108,7 @@ class Knawat_Dropshipping_Woocommerce{
 
 		// Plugin version.
 		if( ! defined( 'KNAWAT_DROPWC_VERSION' ) ){
-			define( 'KNAWAT_DROPWC_VERSION', '1.2.0' );
+			define( 'KNAWAT_DROPWC_VERSION', '2.0.0' );
 		}
 
 		// Plugin folder Path.
