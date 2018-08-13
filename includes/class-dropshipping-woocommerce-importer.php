@@ -164,6 +164,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 						if( $total_qty > 0 ){
 							$result = $this->process_item( $formated_data );
 						} else {
+							$this->params['product_index'] = $index;
 							knawat_dropshipwc_logger("[0_QTY_PRODUCT] SKU:".$formated_data['sku']);
 							continue;
 						}
