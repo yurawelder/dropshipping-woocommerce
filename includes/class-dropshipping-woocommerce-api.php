@@ -33,7 +33,7 @@ class Knawat_Dropshipping_Woocommerce_API {
      * Contains the API url
      * @access protected
      */
-    protected $api_url = 'https://dev.mp.knawat.io/api';
+    protected $api_url = 'https://mp.knawat.io/api';
 
 	/**
 	* __construct function.
