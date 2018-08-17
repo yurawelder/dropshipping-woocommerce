@@ -61,6 +61,9 @@ if( empty( $consumer_keys ) ){
 							<a class="button button-primary" disabled="disabled">
 								<?php esc_html_e( 'Start Import', 'dropshipping-woocommerce' ); ?>
 							</a>
+							<a class="button" href="<?php echo wp_nonce_url( admin_url('admin-post.php?action=knawatds_stop_import' ), 'knawatds_stop_import_action', 'stop_import_nonce' ); ?>" onclick="return confirm('<?php esc_html_e( 'Are you sure? do you really want to stop import?', 'dropshipping-woocommerce' ); ?>')">
+								<?php esc_html_e( 'Stop Import', 'dropshipping-woocommerce' ); ?>
+							</a>
 							<p class="description">
 								<?php _e( 'Product import is In-progress already. you can\'t start import now. Please find current import status below.', 'dropshipping-woocommerce' ); ?>
 							</p>

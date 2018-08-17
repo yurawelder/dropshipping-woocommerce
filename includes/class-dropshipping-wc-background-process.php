@@ -67,6 +67,13 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 		// Logs import data
 		knawat_dropshipwc_logger( '[IMPORT_STATS_IMPORTER]'.print_r( $results, true ), 'info' );
 
+		$is_stop_import = get_transient('knawat_stop_import');
+		if( $is_stop_import === 'product_import' ){
+			delete_transient( 'knawat_stop_import' );
+			$params['is_complete'] = true;
+			$params['force_stopped'] = true;
+		}
+
 		if ( $params['is_complete'] ) {
 
 			// Send success.
@@ -117,6 +124,41 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 	protected function complete() {
 		parent::complete();
 		// Show notice to user or perform some other arbitrary task...
+	}
+
+	/**
+	 * Delete all import batches.
+	 *
+	 * @return Knawat_Dropshipping_WC_Background
+	 */
+	public function delete_all_batches() {
+		global $wpdb;
+
+		$table  = $wpdb->options;
+		$column = 'option_name';
+
+		if ( is_multisite() ) {
+			$table  = $wpdb->sitemeta;
+			$column = 'meta_key';
+		}
+
+		$key = $wpdb->esc_like( $this->identifier . '_batch_' ) . '%';
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE {$column} LIKE %s", $key ) ); // @codingStandardsIgnoreLine.
+
+		return $this;
+	}
+
+	/**
+	 * Kill process.
+	 *
+	 * Stop processing queue items, clear cronjob and delete all batches.
+	 */
+	public function kill_process() {
+		if ( ! $this->is_queue_empty() ) {
+			$this->delete_all_batches();
+			wp_clear_scheduled_hook( $this->cron_hook_identifier );
+		}
 	}
 }
 

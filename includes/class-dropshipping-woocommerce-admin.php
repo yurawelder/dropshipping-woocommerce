@@ -47,6 +47,8 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		add_action( 'admin_notices', array( $this, 'display_notices') );
 		// Start Manual import.
 		add_action( 'admin_post_knawatds_manual_import', array( $this, 'knawat_start_manual_product_import') );
+		// Stop import.
+		add_action( 'admin_post_knawatds_stop_import', array( $this, 'knawat_stop_product_import') );
 
 		// Add Knawat Order Status column to order list table
 		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
@@ -434,6 +436,29 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		}
 		$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import', 'manual_run' => '0' ), $this->adminpage_url ) );
 		wp_redirect(  $redirect_url );
+		exit();
+	}
+
+	/**
+	 * Stop product import.
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_stop_product_import() {
+		if( wp_verify_nonce( sanitize_key( $_GET['stop_import_nonce'] ), 'knawatds_stop_import_action') ){
+
+			if ( class_exists( 'Knawat_Dropshipping_WC_Background', false ) ) {
+				$import_process = new Knawat_Dropshipping_WC_Background();
+				// Kill Import
+				$import_process->kill_process();
+				set_transient( 'knawat_stop_import', 'product_import', 20 );
+			}
+			$messages = array();
+			$messages['success'][] = esc_attr__( 'Import has been stopped successfully.', 'dropshipping-woocommerce' );
+			knawat_set_notices($messages);
+		}
+		$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import' ), $this->adminpage_url ) );
+		wp_safe_redirect(  $redirect_url );
 		exit();
 	}
 

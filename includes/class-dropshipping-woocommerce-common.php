@@ -26,7 +26,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'woocommerce_before_single_product', array( $this, 'knawat_dropshipwc_before_single_product' ) );
 		add_action( 'knawat_dropshipwc_validate_access_token', array( $this, 'validate_access_token' ) );
 		add_action( 'admin_init', array( $this, 'maybe_display_access_token_warning' ) );
-		// add_action( 'admin_init', array( $this, 'display_knawat_persistent_notices' ) );
+		add_action( 'admin_init', array( $this, 'display_knawat_persistent_notices' ) );
 		add_action( 'wp_ajax_knawat_dismiss_admin_notice', array( $this, 'knawat_dismiss_admin_notice' ) );
 	}
 
