@@ -443,6 +443,24 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 		return $this->params;
 	}
 
+	/**
+	 * The exporter prepends a ' to fields that start with a - which causes
+	 * issues with negative numbers. This removes the ' if the input is still a valid
+	 * number after removal.
+	 *
+	 * @since 2.0.0
+	 * @param string $value A numeric string that may or may not have ' prepended.
+	 * @return string
+	 */
+	function unescape_negative_number( $value ) {
+		if ( 0 === strpos( $value, "'-" ) ) {
+			$unescaped = trim( $value, "'" );
+			if ( is_numeric( $unescaped ) ) {
+				return $unescaped;
+			}
+		}
+		return $value;
+	}
 }
 
 endif;
