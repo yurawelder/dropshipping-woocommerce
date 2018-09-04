@@ -28,6 +28,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'admin_init', array( $this, 'maybe_display_access_token_warning' ) );
 		add_action( 'admin_init', array( $this, 'display_knawat_persistent_notices' ) );
 		add_action( 'wp_ajax_knawat_dismiss_admin_notice', array( $this, 'knawat_dismiss_admin_notice' ) );
+		add_action( 'before_delete_post', array( $this, 'knawat_delete_product_on_mp' ) );
 	}
 
 	/**
@@ -336,6 +337,45 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			}
 		}
 		delete_transient( 'knawat_persistent_notices' );
+	}
+
+	/**
+	 * Async Call for delete MP product.
+	 *
+	 * @param int $post_id
+	 */
+	function knawat_delete_product_on_mp( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( $post->post_type == 'product' ) {
+			$product = wc_get_product( $post_id );
+			$sku = $product->get_sku();
+
+			if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) || empty($sku)) {
+				return;
+			}
+
+			// Async Product Update.
+			$data = array( 'operation' => 'delete_product', 'delete_sku'=> $sku );
+			$async_request = new Knawat_Dropshipping_WC_Async_Request();
+			$async_request->data( $data );
+			$async_request->dispatch();
+		}
+	}
+
+	/**
+	 * Delete MP product by SKU.
+	 *
+	 * @param string $sku
+	 */
+	function knawat_delete_mp_product_by_sku( $sku ) {
+		if ( ! class_exists( 'Knawat_Dropshipping_Woocommerce_API', false ) || empty($sku)) {
+			return;
+		}
+
+		// Call API for delete products.
+		$mp_api = new Knawat_Dropshipping_Woocommerce_API();
+		$is_deleted = $mp_api->delete( 'catalog/products/'. sanitize_text_field( $sku ) );
 	}
 
 }

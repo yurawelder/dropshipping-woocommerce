@@ -229,4 +229,43 @@ class Knawat_Dropshipping_Woocommerce_API {
 		}
 		return;
 	}
+
+	/**
+    * Delete function.
+    *
+    * Performs an API DELETE request
+    *
+    * @access public
+    * @return object
+    */
+    public function delete( $path, $data = array(), $return_array = FALSE ) {
+		if( empty( $this->token ) ){
+			return new WP_Error( 'token_not_found', __( 'Access token not found for API. Please make sure your store is connected to knawat.com', 'dropshipping-woocommerce' ) );
+		}
+		$url = $this->api_url . '/' . $path;
+		$this->headers['Authorization'] = 'Bearer ' . $this->token;
+		$response = wp_remote_request( $url, array(
+			'method'  => 'DELETE',
+			'body'	  => $data,
+			'headers' => $this->headers
+		) );
+
+		if ( ! is_wp_error( $response ) ) {
+			// In Case return full response
+			if( $return_array ){
+				return $response;
+			}
+
+			$response = wp_remote_retrieve_body( $response );
+			if ( !is_wp_error( $response ) ) {
+				// Return json Decoded response.
+				return json_decode( $response );
+			} else {
+				return $response;
+			}
+		}else{
+			return $response;
+		}
+		return;
+	}
 }
