@@ -330,6 +330,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					if( is_numeric( $variation->sale_price ) ){
 						$temp_variant['sale_price'] = wc_format_decimal( $variation->sale_price );
 					}
+					$temp_variant['manage_stock'] = true;
 					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
 				}else{
 
