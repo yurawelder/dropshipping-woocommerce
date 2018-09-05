@@ -131,6 +131,7 @@ class Knawat_Dropshipping_Woocommerce_API {
 
 		if ( false === $response ) {
 			$response = wp_remote_get( $url, array(
+				'timeout' => 10,
 				'headers' => $this->headers
 			) );
 
@@ -169,6 +170,7 @@ class Knawat_Dropshipping_Woocommerce_API {
 		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_post( $url, array(
 			'body'	  => $data,
+			'timeout' => 10,
 			'headers' => $this->headers
 		) );
 
@@ -207,6 +209,7 @@ class Knawat_Dropshipping_Woocommerce_API {
 		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_request( $url, array(
 			'method'  => 'PUT',
+			'timeout' => 10,
 			'body'	  => $data,
 			'headers' => $this->headers
 		) );
@@ -246,6 +249,7 @@ class Knawat_Dropshipping_Woocommerce_API {
 		$this->headers['Authorization'] = 'Bearer ' . $this->token;
 		$response = wp_remote_request( $url, array(
 			'method'  => 'DELETE',
+			'timeout' => 10,
 			'body'	  => $data,
 			'headers' => $this->headers
 		) );
