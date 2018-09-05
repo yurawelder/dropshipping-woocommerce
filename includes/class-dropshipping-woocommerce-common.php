@@ -29,6 +29,7 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		add_action( 'admin_init', array( $this, 'display_knawat_persistent_notices' ) );
 		add_action( 'wp_ajax_knawat_dismiss_admin_notice', array( $this, 'knawat_dismiss_admin_notice' ) );
 		add_action( 'before_delete_post', array( $this, 'knawat_delete_product_on_mp' ) );
+		add_action( 'wp_trash_post', array( $this, 'knawat_show_notice_for_delete' ) );
 	}
 
 	/**
@@ -348,9 +349,13 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		$post = get_post( $post_id );
 
 		if ( $post->post_type == 'product' ) {
+			$is_knawat = knawat_dropshipwc_is_knawat_product( $post_id );
+			if( !$is_knawat ) {
+				return;
+			}
+
 			$product = wc_get_product( $post_id );
 			$sku = $product->get_sku();
-
 			if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) || empty($sku)) {
 				return;
 			}
@@ -383,6 +388,24 @@ class Knawat_Dropshipping_Woocommerce_Common {
 				if( isset( $is_deleted->product->message ) ){
 					knawat_dropshipwc_logger( '[MP_PRODUCT_DELETE_FAIL] SKU:'.$sku.' REASON:'.$is_deleted->product->message, 'error' );
 				}
+			}
+		}
+	}
+
+	/**
+	 * Display Delete notice during trash product
+	 *
+	 * @param int $post_id
+	 */
+	function knawat_show_notice_for_delete( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( $post->post_type == 'product' ) {
+			$is_knawat = knawat_dropshipwc_is_knawat_product( $post_id );
+			if( $is_knawat ){
+				$messages = array();
+				$messages['warnings'] = array( esc_attr__( 'The product will be imported again from Knawat, if you don\'t want this product, then delete it permanently.', 'dropshipping-woocommerce' ) );
+				knawat_set_notices($messages);
 			}
 		}
 	}
@@ -574,4 +597,18 @@ function knawat_set_notices( $messages ){
 	if( !empty( $messages ) ){
 		set_transient( 'knawat_persistent_notices', $messages, 5 * MINUTE_IN_SECONDS );
 	}
+}
+
+/**
+ * Check if its knawat product or not
+ *
+ * @param 
+ * @return boolean
+ */
+function knawat_dropshipwc_is_knawat_product( $product_id ){
+	$dropshipping = get_post_meta( $product_id, 'dropshipping', true );
+	if( $dropshipping == 'knawat' ){
+		return true;
+	}
+	return false;
 }
