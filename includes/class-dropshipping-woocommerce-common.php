@@ -376,8 +376,16 @@ class Knawat_Dropshipping_Woocommerce_Common {
 		// Call API for delete products.
 		$mp_api = new Knawat_Dropshipping_Woocommerce_API();
 		$is_deleted = $mp_api->delete( 'catalog/products/'. sanitize_text_field( $sku ) );
+		if( isset($is_deleted->product->status) ){
+			if( 'success' === $is_deleted->product->status ){
+				knawat_dropshipwc_logger( '[MP_PRODUCT_DELETED] SKU:'.$sku, 'info' );
+			}else{
+				if( isset( $is_deleted->product->message ) ){
+					knawat_dropshipwc_logger( '[MP_PRODUCT_DELETE_FAIL] SKU:'.$sku.' REASON:'.$is_deleted->product->message, 'error' );
+				}
+			}
+		}
 	}
-
 }
 
 /*
