@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the Knawat WooCommerce DropShipping package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Knawat WooCommerce DropShipping 1.2.0\n"
+"Project-Id-Version: Knawat WooCommerce DropShipping 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dropshipping-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-05-17 09:47:50+00:00\n"
+"POT-Creation-Date: 2018-09-06 07:58:44+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,158 +13,267 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: dropshipping-woocommerce.php:89 dropshipping-woocommerce.php:96
+#: dropshipping-woocommerce.php:91 dropshipping-woocommerce.php:98
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: dropshipping-woocommerce.php:225
+#: dropshipping-woocommerce.php:235
 msgid "Knawat DropShipping"
 msgstr ""
 
-#: dropshipping-woocommerce.php:230
+#: dropshipping-woocommerce.php:240
 msgid "Knawat DropShipping (Saudi Arabia)"
+msgstr ""
+
+#: includes/class-dropshipping-wc-cron.php:42
+msgid "Knawat Order Sync Interval"
+msgstr ""
+
+#: includes/class-dropshipping-wc-mp-orders.php:97
+#: includes/class-dropshipping-wc-mp-orders.php:109
+#: includes/class-dropshipping-wc-mp-orders.php:166
+#: includes/class-dropshipping-wc-mp-orders.php:178
+msgid "Order synchronize fail. order id: #%d"
+msgstr ""
+
+#: includes/class-dropshipping-wc-mp-orders.php:328
+msgid "Some orders are not sycronized with knawat.com. Please"
+msgstr ""
+
+#: includes/class-dropshipping-wc-mp-orders.php:329
+msgid "synchronize it now"
+msgstr ""
+
+#: includes/class-dropshipping-wc-mp-orders.php:375
+msgid "Nonce failed. Please try again."
 msgstr ""
 
 #: includes/class-dropshipping-woocommerce-admin-dashboard.php:37
 msgid "Knawat status"
 msgstr ""
 
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:40
+msgid "Latest News from Knawat"
+msgstr ""
+
 #. translators: %s: net sales
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:142
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:147
 msgid "%s net sales this month"
 msgstr ""
 
 #. translators: %s: net profit
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:158
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:163
 msgid "%s net profit this month"
 msgstr ""
 
 #. translators: 1: top seller product title 2: top seller quantity
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:179
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:184
 msgid "%1$s top seller this month (sold %2$d)"
 msgstr ""
 
 #. translators: %s: order count
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:232
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:237
 msgid "<strong>%s order</strong> awaiting processing"
 msgid_plural "<strong>%s orders</strong> awaiting processing"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: order count
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:243
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:248
 msgid "<strong>%s order</strong> on-hold"
 msgid_plural "<strong>%s orders</strong> on-hold"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: order count
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:302
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:307
 msgid "<strong>%s product</strong> low in stock"
 msgid_plural "<strong>%s products</strong> low in stock"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: order count
-#: includes/class-dropshipping-woocommerce-admin-dashboard.php:313
+#: includes/class-dropshipping-woocommerce-admin-dashboard.php:318
 msgid "<strong>%s product</strong> out of stock"
 msgid_plural "<strong>%s products</strong> out of stock"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:65
-#: includes/class-dropshipping-woocommerce-admin.php:88
+#: includes/class-dropshipping-woocommerce-admin.php:79
+#: includes/class-dropshipping-woocommerce-admin.php:102
 msgid "Knawat Dropshipping"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:65
+#: includes/class-dropshipping-woocommerce-admin.php:79
 msgid "Dropshipping"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:89
+#: includes/class-dropshipping-woocommerce-admin.php:121
+#: templates/admin/dropshipping-woocommerce-import.php:22
+msgid "Product Import"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:125
+#: templates/admin/dropshipping-woocommerce-settings.php:13
 msgid "Settings"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:143
+#: includes/class-dropshipping-woocommerce-admin.php:178
 msgid "Knawat Orders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:221
+#: includes/class-dropshipping-woocommerce-admin.php:256
 msgid "Knawat Products"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:272
+#: includes/class-dropshipping-woocommerce-admin.php:307
 msgid " Rate %1$s Dropshipping Woocommerce%2$s %3$s"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:332
+#: includes/class-dropshipping-woocommerce-admin.php:391
+msgid "Manual import started successfully."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:399
+msgid "Something went wrong during start manual import."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:408
+msgid "Order(s) has been synchronized successfully."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:414
+msgid "Something went wrong during order synchronization, please try again."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:457
+msgid "Import has been stopped successfully."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:486
 msgid "Knawat Order Status:"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:347
+#: includes/class-dropshipping-woocommerce-admin.php:501
 msgid "Knawat Status"
 msgstr ""
 
 #. translators: %s: currency symbol
-#: includes/class-dropshipping-woocommerce-admin.php:400
+#: includes/class-dropshipping-woocommerce-admin.php:554
 msgid "Knawat Cost (%s)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:457
+#: includes/class-dropshipping-woocommerce-admin.php:611
 msgid "Dropshipper"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:460
+#: includes/class-dropshipping-woocommerce-admin.php:614
 msgid "Select Dropshipper for this Product variantion."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:468
+#: includes/class-dropshipping-woocommerce-admin.php:622
 msgid "Stock quantity (Dropshipper)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:470
+#: includes/class-dropshipping-woocommerce-admin.php:624
 msgid "Enter a quantity of product variant for selected dropshipper."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:291
+#: includes/class-dropshipping-woocommerce-admin.php:678
+msgid ""
+"Before you start importing products, it's better to set default category for "
+"import Knawat Products. You can set it from <strong>Products > Categories.</"
+"strong>  ex: New arrivals, or something else as you want."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-admin.php:678
+msgid "Dismiss this notice."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-api.php:122
+#: includes/class-dropshipping-woocommerce-api.php:167
+#: includes/class-dropshipping-woocommerce-api.php:206
+#: includes/class-dropshipping-woocommerce-api.php:246
+msgid ""
+"Access token not found for API. Please make sure your store is connected to "
+"knawat.com"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-common.php:117
+msgid "Another product import is in process already."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-common.php:163
+msgid "Settings has been saved successfully."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-common.php:280
+msgid ""
+"Your connection with knawat.com has been disconnected. Please check and "
+"verify your knawat consumer keys from"
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-common.php:281
+msgid "<strong>Knawat Dropshipping</strong> > <strong>Settings</strong>."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-common.php:407
+msgid ""
+"The product will be imported again from Knawat, if you don't want this "
+"product, then delete it permanently."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-importer.php:106
+msgid "Please provide product sku."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-importer.php:122
+#: includes/class-dropshipping-woocommerce-importer.php:132
+#: includes/class-dropshipping-woocommerce-importer.php:218
+msgid ""
+"Something went wrong during get data from Knawat MP API. Please try again "
+"later."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-orders.php:294
 msgid "Order &ndash; %s"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:291
+#: includes/class-dropshipping-woocommerce-orders.php:294
 msgctxt "Order date parsed by strftime"
 msgid "%b %d, %Y @ %I:%M %p"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:718
+#: includes/class-dropshipping-woocommerce-orders.php:721
 msgctxt "Admin: Order table column"
 msgid "Suborders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:808
+#: includes/class-dropshipping-woocommerce-orders.php:811
 msgid "Suborders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:810
+#: includes/class-dropshipping-woocommerce-orders.php:813
 msgid "Parent order"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:816
+#: includes/class-dropshipping-woocommerce-orders.php:819
 msgid "Knawat Dropshipper"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:861
+#: includes/class-dropshipping-woocommerce-orders.php:864
 msgid "Return to main order"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1059
+#: includes/class-dropshipping-woocommerce-orders.php:1062
 msgid "Mark main order completed when all suborders are completed."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1065
+#: includes/class-dropshipping-woocommerce-orders.php:1068
 msgid "Mark main order refunded when all suborders are refunded."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1445
+#: includes/class-dropshipping-woocommerce-orders.php:1448
 msgid "%1$s stock reduced for \"%2$s\" from %3$s to %4$s."
 msgstr ""
 
@@ -228,35 +337,19 @@ msgstr ""
 msgid "Save Tracking"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:124
-msgid "Knawat Order created"
-msgstr ""
-
-#: includes/class-dropshipping-woocommerce-webhook.php:125
-msgid "Knawat Order updated"
-msgstr ""
-
-#: includes/class-dropshipping-woocommerce-webhook.php:126
-msgid "Knawat Order deleted"
-msgstr ""
-
-#: includes/class-dropshipping-woocommerce-webhook.php:127
-msgid "Knawat Order restored"
-msgstr ""
-
-#: includes/class-dropshipping-woocommerce-webhook.php:134
+#: includes/class-dropshipping-woocommerce-webhook.php:110
 msgid "Knawat Order created (%s)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:135
+#: includes/class-dropshipping-woocommerce-webhook.php:111
 msgid "Knawat Order updated (%s)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:136
+#: includes/class-dropshipping-woocommerce-webhook.php:112
 msgid "Knawat Order deleted (%s)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-webhook.php:137
+#: includes/class-dropshipping-woocommerce-webhook.php:113
 msgid "Knawat Order restored (%s)"
 msgstr ""
 
@@ -289,13 +382,13 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/knawat-merlin-config.php:38 includes/knawat-merlin-config.php:40
-#: includes/lib/knawat-merlin/knawat-merlin.php:791
+#: includes/lib/knawat-merlin/knawat-merlin.php:787
 #: includes/lib/tgmpa/class-tgm-plugin-activation.php:2810
 msgid "Install"
 msgstr ""
 
 #: includes/knawat-merlin-config.php:41
-#: includes/lib/knawat-merlin/knawat-merlin.php:797
+#: includes/lib/knawat-merlin/knawat-merlin.php:793
 #: includes/lib/tgmpa/class-tgm-plugin-activation.php:2819
 msgid "Activate"
 msgstr ""
@@ -321,7 +414,6 @@ msgid ""
 msgstr ""
 
 #: includes/knawat-merlin-config.php:49
-#: templates/dropshipping-woocommerce-admin-page.php:17
 msgid "Connect Your store with Knawat"
 msgstr ""
 
@@ -330,8 +422,7 @@ msgid "You're good to go!"
 msgstr ""
 
 #: includes/knawat-merlin-config.php:51
-msgid ""
-"Please follow Step 1 & Step 2 then after to connect you site with Knawat"
+msgid "Please insert Knawat Knawat Consumer Key and Secret."
 msgstr ""
 
 #: includes/knawat-merlin-config.php:52
@@ -427,7 +518,6 @@ msgid "Welcome"
 msgstr ""
 
 #: includes/lib/knawat-merlin/knawat-merlin.php:491
-#: includes/lib/knawat-merlin/knawat-merlin.php:658
 msgid "Login with Knawat.com"
 msgstr ""
 
@@ -440,57 +530,63 @@ msgid "Ready"
 msgstr ""
 
 #: includes/lib/knawat-merlin/knawat-merlin.php:656
-msgid "Step 1"
+msgid ""
+"Please insert Knawat Knawat Consumer Key and Secret. You can get your Knawat "
+"keys"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:661
-#: includes/lib/knawat-merlin/knawat-merlin.php:668
-msgid "Step 2"
+#: includes/lib/knawat-merlin/knawat-merlin.php:657
+#: templates/admin/dropshipping-woocommerce-settings.php:31
+#: templates/admin/dropshipping-woocommerce-settings.php:48
+msgid "from here"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:663
+#: includes/lib/knawat-merlin/knawat-merlin.php:665
+#: templates/admin/dropshipping-woocommerce-settings.php:23
+msgid "Knawat Consumer Key"
+msgstr ""
+
 #: includes/lib/knawat-merlin/knawat-merlin.php:670
-msgid "Connect with Knawat.com"
+#: templates/admin/dropshipping-woocommerce-settings.php:40
+msgid "Knawat Consumer Secret"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:676
-#: templates/dropshipping-woocommerce-admin-page.php:24
-msgid "Connected"
-msgstr ""
-
-#: includes/lib/knawat-merlin/knawat-merlin.php:794
+#: includes/lib/knawat-merlin/knawat-merlin.php:790
 #: includes/lib/tgmpa/class-tgm-plugin-activation.php:2816
 msgid "Update"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:799
+#: includes/lib/knawat-merlin/knawat-merlin.php:795
 msgid "and"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:810
+#: includes/lib/knawat-merlin/knawat-merlin.php:806
 msgid "* Developed by third party"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:954
+#: includes/lib/knawat-merlin/knawat-merlin.php:950
 msgid "Activating"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:970
+#: includes/lib/knawat-merlin/knawat-merlin.php:966
 msgid "Updating"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:986
+#: includes/lib/knawat-merlin/knawat-merlin.php:982
 msgid "Installing"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:996
-#: includes/lib/knawat-merlin/knawat-merlin.php:1027
+#: includes/lib/knawat-merlin/knawat-merlin.php:992
+#: includes/lib/knawat-merlin/knawat-merlin.php:1035
 msgid "Success"
 msgstr ""
 
-#: includes/lib/knawat-merlin/knawat-merlin.php:1014
-msgid ""
-"Please Complete Process Step 1 & Step 2 for connect your site with Knawat."
+#: includes/lib/knawat-merlin/knawat-merlin.php:1010
+msgid "Please Insert Knawat Cosumer Key."
+msgstr ""
+
+#: includes/lib/knawat-merlin/knawat-merlin.php:1018
+msgid "Please Insert Knawat Cosumer Secret."
 msgstr ""
 
 #: includes/lib/tgmpa/class-tgm-plugin-activation.php:334
@@ -856,8 +952,147 @@ msgstr ""
 msgid "Installing Plugin %1$s (%2$d/%3$d)"
 msgstr ""
 
-#: templates/dropshipping-woocommerce-admin-page.php:28
-msgid "Connect"
+#: includes/lib/wp-background-processing/wp-background-process.php:425
+msgid "Every %d Minutes"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:10
+msgid ""
+"Please insert Knawat Consumer Key and Consumer Secret in <a href=\"%s"
+"\">Settings</a> tab."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:23
+msgid ""
+"Plugin auto import/update products from knawat.com in background on regular "
+"interval. But, if you want then you can manually start import."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:30
+msgid "Start product import"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:38
+#: templates/admin/dropshipping-woocommerce-import.php:44
+#: templates/admin/dropshipping-woocommerce-import.php:62
+msgid "Start Import"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:47
+msgid ""
+"You're not connected to a knawat.com, please make a connection for start "
+"import."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:64
+msgid "Are you sure? do you really want to stop import?"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:65
+msgid "Stop Import"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:68
+msgid ""
+"Product import is In-progress already. you can't start import now. Please "
+"find current import status below."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:71
+msgid "Imported:"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:71
+#: templates/admin/dropshipping-woocommerce-import.php:72
+#: templates/admin/dropshipping-woocommerce-import.php:73
+msgid "%d Products with variations."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:72
+msgid "Updated:"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-import.php:73
+msgid "Failed:"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:14
+msgid ""
+"Note: Only orders in Processing status will be sent to Knawat to processs."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:15
+msgid ""
+"You need a Knawat consumer key and consumer secret for import products into "
+"your store from knawat.com"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:30
+msgid "You can get your Knawat Consumer Key"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:47
+msgid "You can get your Knawat Consumer Secret"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:57
+msgid "Products Batch Size:"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:63
+msgid "Products batch size for import products from knawat.com"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:71
+msgid "Orders Synchronization Interval:"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:76
+msgid "48 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:77
+msgid "24 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:78
+msgid "12 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:79
+msgid "9 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:80
+msgid "6 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:81
+msgid "3 Hours"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:94
+msgid "Select interval for synchronization orders with Knawat"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:103
+msgid "Knawat Connection status"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:110
+msgid "Connected"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:116
+msgid "Not connected"
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:120
+msgid "Please verify your knawat consumer keys."
+msgstr ""
+
+#: templates/admin/dropshipping-woocommerce-settings.php:135
+msgid "Save Settings"
 msgstr ""
 
 #: templates/myaccount/shipment-tracking.php:11
@@ -879,9 +1114,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.2.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.0)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 1.2.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.0)  #-#-#-#-#
 #. Description of the plugin/theme
 msgid "Knawat WooCommerce DropShipping"
 msgstr ""
