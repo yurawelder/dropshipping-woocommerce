@@ -151,6 +151,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 			if( isset( $knawatds_options['product_batch'] ) && is_numeric( $knawatds_options['product_batch'] ) ){
 				$current_options['product_batch'] = sanitize_text_field( $knawatds_options['product_batch'] );
 			}
+			if( isset( $knawatds_options['dokan_seller'] ) && is_numeric( $knawatds_options['dokan_seller'] ) ){
+				$current_options['dokan_seller'] = sanitize_text_field( $knawatds_options['dokan_seller'] );
+			}
 
 			if( isset( $_POST['order_pull_interval'] ) && is_numeric( $_POST['order_pull_interval'] ) ){
 				$knawat_dropshipwc->cron->knawat_update_pull_order_cron_interval( sanitize_text_field( $_POST['order_pull_interval'] ) );
@@ -602,12 +605,24 @@ function knawat_set_notices( $messages ){
 /**
  * Check if its knawat product or not
  *
- * @param 
+ * @param int $product_id Product ID
  * @return boolean
  */
 function knawat_dropshipwc_is_knawat_product( $product_id ){
 	$dropshipping = get_post_meta( $product_id, 'dropshipping', true );
 	if( $dropshipping == 'knawat' ){
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Check if dokan is active or not.
+ *
+ * @return boolean
+ */
+function knawat_dropshipwc_is_dokan_active(){
+	if( class_exists( 'WeDevs_Dokan', false ) ){
 		return true;
 	}
 	return false;

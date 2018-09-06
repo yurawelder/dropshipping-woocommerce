@@ -162,7 +162,9 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 						$result = array( 'id' => $formated_data['id'], 'updated' => true );
 					}else{
 						if( $total_qty > 0 ){
+							add_filter( 'woocommerce_new_product_data', array( $this, 'set_dokan_seller' ) );
 							$result = $this->process_item( $formated_data );
+							remove_filter( 'woocommerce_new_product_data', array( $this, 'set_dokan_seller' ) );
 						} else {
 							$this->params['product_index'] = $index;
 							knawat_dropshipwc_logger("[0_QTY_PRODUCT] SKU:".$formated_data['sku']);
@@ -183,7 +185,9 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 							foreach ( $variations as $vindex => $variation ) {
 								$variation['parent_id'] = $product_id;
+								add_filter( 'woocommerce_new_product_variation_data', array( $this, 'set_dokan_seller' ) );
 								$variation_result = $this->process_item( $variation );
+								remove_filter( 'woocommerce_new_product_variation_data', array( $this, 'set_dokan_seller' ) );
 								if ( is_wp_error( $variation_result ) ) {
 									$variation_result->add_data( array( 'data' => $formated_data ) );
 									$variation_result->add_data( array( 'variation' => 1 ) );
@@ -461,6 +465,23 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			}
 		}
 		return $value;
+	}
+
+	/**
+	 * Setup product seller for add dokan support.
+	 *
+	 * @since 2.0.0
+	 * @param array $product_data Product data for create new product
+	 * @return array $product_data Altered Product data
+	 */
+	function set_dokan_seller( $product_data ) {
+		if( knawat_dropshipwc_is_dokan_active() ) {
+			$dokan_seller = knawat_dropshipwc_get_options( 'dokan_seller' );
+			if( isset( $product_data['post_author'] ) && $dokan_seller > 0 ){
+				$product_data['post_author'] = $dokan_seller;
+			}
+		}
+		return $product_data;
 	}
 }
 

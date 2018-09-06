@@ -7,6 +7,7 @@ $mp_consumer_key = isset( $knawat_options['mp_consumer_key'] ) ? esc_attr( $knaw
 $mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr( $knawat_options['mp_consumer_secret'] ) : '';
 $token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : 'invalid';
 $product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_options['product_batch'] ) : 25;
+$dokan_seller = isset( $knawat_options['dokan_seller'] ) ? esc_attr( $knawat_options['dokan_seller'] ) : -1;
 ?>
 <div class="knawat_dropshipwc_settings">
 
@@ -96,6 +97,32 @@ $product_batch = isset( $knawat_options['product_batch'] ) ? esc_attr( $knawat_o
 						</p>
 					</td>
 				</tr>
+
+				<?php if( knawat_dropshipwc_is_dokan_active() ) { ?>
+					<tr class="knawat_dropshipwc_row">
+						<th scope="row">
+							<?php _e( 'Dokan Seller','dropshipping-woocommerce' ); ?>
+						</th>
+						<td>
+							<?php
+							$seller_args = array(
+								'name'		=> 'knawat[dokan_seller]',
+								'id'		=> 'knawat_dokan_seller',
+								'class'		=> 'dokan_seller',
+								'role'		=> 'seller',
+								'selected'	=> $dokan_seller,
+								'show_option_none' => __( 'Select Dokan Seller','dropshipping-woocommerce' )
+							);
+							wp_dropdown_users( $seller_args );
+							?>
+							<p class="description" id="dokan_seller-description">
+								<?php
+								_e( 'Select dokan seller for import Knawat products under it.', 'dropshipping-woocommerce' );
+								?>
+							</p>
+						</td>
+					</tr>
+				<?php } ?>
 
 				<?php if( $mp_consumer_key !='' && $mp_consumer_secret != '' ){ ?>
 					<tr class="knawat_dropshipwc_row">
