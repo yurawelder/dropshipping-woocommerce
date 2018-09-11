@@ -27,9 +27,9 @@ $dokan_seller = isset( $knawat_options['dokan_seller'] ) ? esc_attr( $knawat_opt
 						<input class="mp_consumer_key regular-text" name="knawat[mp_consumer_key]" type="text" value="<?php if ( $mp_consumer_key != '' ) { echo $mp_consumer_key; } ?>" />
 						<p class="description" id="mp_consumer_key-description">
 							<?php
-							printf( '%s <a href="https://app.knawat.com/" target="_blank">%s</a>',
-								__('You can get your Knawat Consumer Key', 'dropshipping-woocommerce' ),
-								__('from here', 'dropshipping-woocommerce' )
+							printf( '%s <a href="https://knawat.com/wp-content/uploads/2018/09/knawat_api_key_and_secret.png" target="_blank">%s</a>',
+								__('You can get your Knawat Consumer Key from your <strong>Dashboard > Store settings</strong>', 'dropshipping-woocommerce' ),
+								__('click to see the image', 'dropshipping-woocommerce' )
 							);
 							?>
 						</p>
@@ -44,9 +44,9 @@ $dokan_seller = isset( $knawat_options['dokan_seller'] ) ? esc_attr( $knawat_opt
 						<input class="mp_consumer_secret regular-text" name="knawat[mp_consumer_secret]" type="text" value="<?php if ( $mp_consumer_secret != '' ) { echo $mp_consumer_secret; } ?>" />
 						<p class="description" id="mp_consumer_secret-description">
 							<?php
-							printf( '%s <a href="https://app.knawat.com/" target="_blank">%s</a>',
-								__('You can get your Knawat Consumer Secret', 'dropshipping-woocommerce' ),
-								__('from here', 'dropshipping-woocommerce' )
+							printf( '%s <a href="https://knawat.com/wp-content/uploads/2018/09/knawat_api_key_and_secret.png" target="_blank">%s</a>',
+								__('You can get your Knawat Consumer Secret from your <strong>Dashboard > Store settings</strong>', 'dropshipping-woocommerce' ),
+								__('click to see the image', 'dropshipping-woocommerce' )
 							);
 							?>
 						</p>
