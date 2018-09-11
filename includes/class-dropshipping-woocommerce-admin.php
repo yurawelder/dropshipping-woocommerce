@@ -549,11 +549,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function knawat_dropshipwc_add_knawat_cost_field( $loop, $variation_data, $variation ){
 		$knawat_cost = get_post_meta( $variation->ID, '_knawat_cost', true );
 		if( !empty( $knawat_cost ) ){
-			$label = sprintf(
-				/* translators: %s: currency symbol */
-				__( 'Knawat Cost (%s)', 'dropshipping-woocommerce' ),
-				get_woocommerce_currency_symbol()
-			);
+			$label = __( 'Knawat Cost ($)', 'dropshipping-woocommerce' );
 			?>
 			<p class="form-field knawat_dropshipwc_knawat_cost form-row form-row-first">
 				<label for="knawat_cost<?php echo $loop; ?>"><?php echo $label; ?></label>
