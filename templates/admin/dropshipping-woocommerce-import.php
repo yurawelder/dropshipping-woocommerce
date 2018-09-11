@@ -11,9 +11,7 @@ if( empty( $consumer_keys ) ){
 	</div>
 	<?php
 }else{
-	global $wpdb;
-	$batch_query = "SELECT * FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' AND option_value NOT LIKE '%pull_operation%' ORDER BY option_id ASC LIMIT 1";
-	$batches = $wpdb->get_results( $batch_query );
+	$batches = knawat_dropshipwc_get_inprocess_import();
 	$knawat_options = knawat_dropshipwc_get_options();
 	$token_status = isset( $knawat_options['token_status'] ) ? esc_attr( $knawat_options['token_status'] ) : 'invalid';
 	?>

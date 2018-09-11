@@ -84,6 +84,9 @@ class Knawat_Dropshipping_WC_Cron {
 
 		global $wpdb;
 		$count_query = "SELECT count(option_id) as count FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' AND option_value LIKE '%pull_operation%' ORDER BY option_id ASC";
+		if ( is_multisite() ) {
+			$count_query = "SELECT count(meta_id) as count FROM {$wpdb->sitemeta} WHERE meta_key LIKE '%kdropship_import_batch_%' AND meta_value LIKE '%pull_operation%' ORDER BY meta_id ASC";
+		}
 		$count = $wpdb->get_var( $count_query );
 		if( $count > 0 ){
 			// Another Order Synchronization is in process already

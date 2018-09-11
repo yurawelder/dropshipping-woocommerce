@@ -110,6 +110,9 @@ class Knawat_Dropshipping_Woocommerce_Common {
 
 		global $wpdb;
 		$count_query = "SELECT count(option_id) as count FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' AND option_value NOT LIKE '%pull_operation%' ORDER BY option_id ASC";
+		if ( is_multisite() ) {
+			$count_query = "SELECT count(meta_id) as count FROM {$wpdb->sitemeta} WHERE meta_key LIKE '%kdropship_import_batch_%' AND meta_value NOT LIKE '%pull_operation%' ORDER BY meta_id ASC";
+		}
 		$count = $wpdb->get_var( $count_query );
 
 		if( $count > 0 ){
@@ -626,4 +629,19 @@ function knawat_dropshipwc_is_dokan_active(){
 		return true;
 	}
 	return false;
+}
+
+/**
+ * Get Batch of inprocess product import.
+ *
+ * @return array $batches.
+ */
+function knawat_dropshipwc_get_inprocess_import(){
+	global $wpdb;
+	$batch_query = "SELECT * FROM {$wpdb->options} WHERE option_name LIKE '%kdropship_import_batch_%' AND option_value NOT LIKE '%pull_operation%' ORDER BY option_id ASC LIMIT 1";
+	if ( is_multisite() ) {
+		$batch_query = "SELECT * FROM {$wpdb->sitemeta} WHERE meta_key LIKE '%kdropship_import_batch_%' AND meta_value NOT LIKE '%pull_operation%' ORDER BY meta_id ASC LIMIT 1";
+	}
+	$batches = $wpdb->get_results( $batch_query );
+	return $batches;
 }
