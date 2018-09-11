@@ -651,7 +651,7 @@ function knawat_dropshipwc_get_inprocess_import(){
  *
  * @return void.
  */
-function knawat_dropshipwc_delete_deprecated_Webhooks(){
+function knawat_dropshipwc_delete_deprecated_webhooks(){
 	global $wpdb;
 	$query = "SELECT webhook_id FROM {$wpdb->prefix}wc_webhooks WHERE topic IN ('order.knawatcreated', 'order.knawatupdated', 'order.knawatdeleted', 'order.knawatrestored')";
 	$results = $wpdb->get_results( $query ); // WPCS: cache ok, DB call ok, unprepared SQL ok.
@@ -662,4 +662,15 @@ function knawat_dropshipwc_delete_deprecated_Webhooks(){
 			$webhook->delete( true );
 		}
 	}
+}
+
+/**
+ * Delete Deprected API Keys.
+ *
+ * @return void.
+ */
+function knawat_dropshipwc_delete_deprecated_api_keys(){
+	global $wpdb;
+	$delete_query = "DELETE FROM {$wpdb->prefix}woocommerce_api_keys WHERE description LIKE 'Knawat - API %'";
+	$wpdb->query( $delete_query );
 }

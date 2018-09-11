@@ -663,7 +663,9 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 					wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
 				}
 				// Delete Deprecated webhooks.
-				knawat_dropshipwc_delete_deprecated_Webhooks();
+				knawat_dropshipwc_delete_deprecated_webhooks();
+				// Delete Deprecated API Keys.
+				knawat_dropshipwc_delete_deprecated_api_keys();
 			}
 			update_option( 'knawat_dropwc_version', KNAWAT_DROPWC_VERSION );
 		}
