@@ -645,3 +645,21 @@ function knawat_dropshipwc_get_inprocess_import(){
 	$batches = $wpdb->get_results( $batch_query );
 	return $batches;
 }
+
+/**
+ * Delete Deprected Webhooks.
+ *
+ * @return void.
+ */
+function knawat_dropshipwc_delete_deprecated_Webhooks(){
+	global $wpdb;
+	$query = "SELECT webhook_id FROM {$wpdb->prefix}wc_webhooks WHERE topic IN ('order.knawatcreated', 'order.knawatupdated', 'order.knawatdeleted', 'order.knawatrestored')";
+	$results = $wpdb->get_results( $query ); // WPCS: cache ok, DB call ok, unprepared SQL ok.
+	$ids = wp_list_pluck( $results, 'webhook_id' );
+	if( class_exists( 'WC_Webhook', false) && !empty( $ids ) ){
+		foreach ( $ids as $webhook_id ) {
+			$webhook = new WC_Webhook( (int) $webhook_id );
+			$webhook->delete( true );
+		}
+	}
+}

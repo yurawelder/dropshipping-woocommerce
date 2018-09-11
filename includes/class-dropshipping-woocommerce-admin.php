@@ -657,9 +657,13 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		$installed_version = get_option( 'knawat_dropwc_version', '1.2.0' );
 
 		if ( version_compare( $installed_version, KNAWAT_DROPWC_VERSION, '<' ) ) {
-			if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
-				// Add Hourly Scheduled import.
-				wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+			if ( version_compare( $installed_version, '2.0.0', '<' ) ) {
+				if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
+					// Add Hourly Scheduled import.
+					wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+				}
+				// Delete Deprecated webhooks.
+				knawat_dropshipwc_delete_deprecated_Webhooks();
 			}
 			update_option( 'knawat_dropwc_version', KNAWAT_DROPWC_VERSION );
 		}
