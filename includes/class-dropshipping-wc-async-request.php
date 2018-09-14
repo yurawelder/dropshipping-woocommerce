@@ -41,9 +41,10 @@ class Knawat_Dropshipping_WC_Async_Request extends WP_Async_Request {
 		}
 		if( isset( $_POST['operation'] ) && sanitize_text_field( $_POST['operation'] ) == 'pull_order' ){
 			$knawat_order_id = isset( $_POST['knawat_order_id'] ) ? sanitize_text_field( $_POST['knawat_order_id'] ) : '';
+			$order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( $_POST['order_id'] ) : '';
 			if( $knawat_order_id != '' ){
 				global $knawat_dropshipwc;
-				$pulled = $knawat_dropshipwc->mp_orders->knawat_pull_knawat_order_information( $knawat_order_id );
+				$pulled = $knawat_dropshipwc->mp_orders->knawat_pull_knawat_order_information( $knawat_order_id, $order_id );
 			}
 		} elseif( isset( $_POST['operation'] ) && sanitize_text_field( $_POST['operation'] ) == 'delete_product' ){
 			$delete_sku = isset( $_POST['delete_sku'] ) ? sanitize_text_field( $_POST['delete_sku'] ) : '';

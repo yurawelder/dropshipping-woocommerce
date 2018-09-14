@@ -283,6 +283,12 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				'value' => esc_attr( $query_vars['knawat_sync_failed'] ),
 			);
 		}
+		if ( ! empty( $query_vars['knawat_order_id'] ) ) {
+			$query['meta_query'][] = array(
+				'key'   => '_knawat_order_id',
+				'value' => esc_attr( $query_vars['knawat_order_id'] ),
+			);
+		}
 
 		return $query;
 	}
@@ -381,13 +387,13 @@ class Knawat_Dropshipping_WC_MP_Orders {
 	 *
 	 * @since    2.0.0
 	 */
-	public function knawat_pull_knawat_order_information( $knawat_order_id ) {
+	public function knawat_pull_knawat_order_information( $knawat_order_id, $order_id ) {
 		if( $knawat_order_id != ''){
 			$mp_api = new Knawat_Dropshipping_Woocommerce_API();
 			$knawat_order = $mp_api->get( 'orders/'.$knawat_order_id );
 			if( isset( $knawat_order->id ) && $knawat_order->id == $knawat_order_id ){
 				// Update Knawat Data here.
-				$this->knawat_update_knawat_order( $knawat_order );
+				$this->knawat_update_knawat_order( $knawat_order, $order_id );
 			}
 		}
 	}
@@ -428,11 +434,28 @@ class Knawat_Dropshipping_WC_MP_Orders {
 	 *
 	 * @since    2.0.0
 	 */
-	public function knawat_update_knawat_order( $knawat_order ) {
-		/////////////////////////////////////////////////
-		/////										/////
-		/////  @TODO: ADD ORDER UPDATE MAGIC HERE   /////
-		/////										/////
-		/////////////////////////////////////////////////
+	public function knawat_update_knawat_order( $knawat_order, $order_id = 0 ) {
+		$knawat_status = isset( $knawat_order->knawat_order_status ) ? sanitize_text_field( $knawat_order->knawat_order_status ) : '';
+		$shipment_provider_name = isset( $knawat_order->shipment_provider_name ) ? sanitize_text_field( $knawat_order->shipment_provider_name ) : '';
+		$shipment_tracking_number = isset( $knawat_order->shipment_tracking_number ) ? sanitize_text_field( $knawat_order->shipment_tracking_number ) : '';
+
+		if( $knawat_status !== '' || $shipment_provider_name !== '' || $shipment_tracking_number !== ''){
+			if( !empty($knawat_order) ){
+				if( $order_id == 0 ){
+					// Get order Id based on orderID.
+					$orders = wc_get_orders( array( 'knawat_order_id' => $knawat_order->id, 'limit' => 1, 'return' => 'ids' ) );
+					if( !empty($orders) ){
+						$order_id = $orders[0];
+					}
+				}
+				$order = wc_get_order( $order_id );
+				if(!empty($order)){
+					$order->update_meta_data( '_knawat_order_status', $knawat_status );
+					$order->update_meta_data( '_shipment_provider_name', $shipment_provider_name );
+					$order->update_meta_data( '_shipment_tracking_number', $shipment_tracking_number );
+					$order->save();
+				}
+			}
+		}
 	}
 }

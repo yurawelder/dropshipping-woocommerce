@@ -710,7 +710,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 					}
 					// Async Order Update.
 					$async_request = new Knawat_Dropshipping_WC_Async_Request();
-					$async_request->data( array( 'operation' => 'pull_order', 'knawat_order_id' => $knawat_order_id ) );
+					$async_request->data( array( 'operation' => 'pull_order', 'knawat_order_id' => $knawat_order_id, 'order_id' => $order_id ) );
 					$temp = $async_request->dispatch();
 				}
 			}
