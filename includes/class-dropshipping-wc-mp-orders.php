@@ -207,10 +207,7 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		$request->set_param( 'id', $order_id );
 		$result  = $controller->get_item( $request );
 		$order   = isset( $result->data ) ? $result->data : array();
-		$order_whitelist_fields = array( 'id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url' );
-		if( !$is_update ){
-			$order_whitelist_fields = array( 'id', 'parent_id', 'number', 'order_key', 'created_via', 'currency', 'discount_total', 'discount_tax', 'shipping_total', 'shipping_tax', 'cart_tax','total','total_tax','prices_include_tax', 'customer_note', 'transaction_id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
-		}
+		$order_whitelist_fields = array( 'id', 'parent_id', 'number', 'order_key', 'created_via', 'currency', 'discount_total', 'discount_tax', 'shipping_total', 'shipping_tax', 'cart_tax','total','total_tax','prices_include_tax', 'customer_note', 'transaction_id', 'status', 'line_items', 'billing', 'shipping', 'pdf_invoice_url', 'pdf_invoice_url_rtl' );
 		$item_whitelist_fields = array( 'id', 'sku', 'quantity' );
 		$new_order = array();
 
@@ -258,6 +255,8 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				}
 			}
 		}
+		// Replace OrderKey with order Number for better readability in Odoo & AgileCRM
+		$new_order['order_key'] = $new_order['number'];
 
 		// Add Email and phone into Shipping.
 		$new_order['shipping']['email'] = $new_order['billing']['email'];
