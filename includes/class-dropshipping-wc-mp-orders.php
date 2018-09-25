@@ -225,12 +225,23 @@ class Knawat_Dropshipping_WC_MP_Orders {
 
 		if ( isset( $new_order['items'] ) && ! empty( $new_order['items'] ) ) {
 			foreach ( $new_order['items'] as $itemkey => $item ) {
+				if( ! $this->is_knawat_product_variation( $new_order['items'][ $itemkey ]['product_id'] ) ){
+					unset( $new_order['items'][ $itemkey ] );
+					continue;
+				}
+				$product_id = $new_order['items'][ $itemkey ]['id'];
 				foreach ( $item as $ikey => $ivalue ) {
 					if ( ! in_array( $ikey, $item_whitelist_fields ) ) {
 						unset( $new_order['items'][ $itemkey ][ $ikey ] );
 					}
 				}
 			}
+		}
+		// Fix array for json_encode.
+		$items = $new_order['items'];
+		$new_order['items'] = [];
+		foreach ($items as $key => $value) {
+			$new_order['items'][] = $value;
 		}
 
 		// Set Payment Method.
@@ -456,5 +467,20 @@ class Knawat_Dropshipping_WC_MP_Orders {
 				}
 			}
 		}
+	}
+
+	public function is_knawat_product_variation( $product_id ){
+		$product = wc_get_product((int)$product_id);
+		if(!empty($product)){
+			$product_id = $product->get_parent_id();
+			if( $product_id === 0){
+				$product_id = $product->get_id();
+			}
+			$dropshipping = get_post_meta( $product_id, 'dropshipping', true );
+			if( $dropshipping == 'knawat' ){
+				return true;
+			}
+		}
+		return false;
 	}
 }
