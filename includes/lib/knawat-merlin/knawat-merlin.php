@@ -621,18 +621,19 @@ class Knawat_Merlin {
 
 		// Strings passed in from the config file.
 		$strings = $this->strings;
-		/*$knawat_options = get_option( KNAWAT_DROPWC_OPTIONS, array() );
-		if( isset( $knawat_options['knawat_status'] ) && $knawat_options['knawat_status'] != '' && $knawat_options['knawat_status'] == 'connected' ) {
-			$already_setup = 1;
-		}*/
+
+		$knawat_options = knawat_dropshipwc_get_options();
+		$mp_consumer_key = isset( $knawat_options['mp_consumer_key'] ) ? esc_attr( $knawat_options['mp_consumer_key'] ) : '';
+		$mp_consumer_secret = isset( $knawat_options['mp_consumer_secret'] ) ? esc_attr( $knawat_options['mp_consumer_secret'] ) : '';
+
 		$already_setup = 0;
-		if( knawat_dropshipwc_is_connected() ){
+		/*if( knawat_dropshipwc_is_connected() ){
 			$already_setup = 1;	
-		}
+		}*/
 				
 		// Text strings.
 		$header 				= ! $already_setup ? $strings['knawat-header'] : $strings['knawat-header-success'];
-		$paragraph 				= ! $already_setup ? $strings['knawat'] : $strings['knawat-success%s'];
+		//$paragraph 				= ! $already_setup ? $strings['knawat'] : $strings['knawat-success%s'];
 		$action 				= $strings['knawat-action-link'];
 		$skip 					= $strings['btn-skip'];
 		$next 					= $strings['btn-next'];
@@ -649,33 +650,28 @@ class Knawat_Merlin {
 
 			<h1><?php echo esc_html( $header ); ?></h1>
 				
-			<p id="knawat-connect-text"><?php echo esc_html( $paragraph ); ?></p>
+			<p id="knawat-connect-text">
+				<?php
+				printf( '%s <a href="https://app.knawat.com/" target="_blank">%s</a>',
+					esc_html__('Please insert Knawat Knawat Consumer Key and Secret. You can get your Knawat keys', 'dropshipping-woocommerce' ),
+					esc_html__('from here', 'dropshipping-woocommerce' )
+				);
+				?>
+			</p><br/>
 
-			<?php if( !$already_setup ){ ?> 
-				<div class="knawat_connect_step_1" style="display: none;">
-					<p><strong><?php _e( 'Step 1', 'dropshipping-woocommerce'); ?></strong></p>
-					<a class="merlin__button merlin__button--blue merlin__button--fullwidth merlin__button--popin" onclick="KnawatPopup1();" style="margin-top: 15px; margin-bottom: 10px;">
-						<?php _e( 'Login with Knawat.com', 'dropshipping-woocommerce'); ?>
-					</a>
+			<div class="knawat_connect_wrap">
 
-					<p><strong><?php _e( 'Step 2', 'dropshipping-woocommerce'); ?></strong></p>
-					<span class="merlin__button merlin__button--blue merlin__button--fullwidth merlin__button--popin" style="margin-top: 15px;margin-bottom: 10px;background: #ddd;cursor: not-allowed;">
-						<?php _e( 'Connect with Knawat.com', 'dropshipping-woocommerce'); ?>
-					</span>
+				<div class="key_field">
+					<?php _e( 'Knawat Consumer Key','dropshipping-woocommerce' ); ?>
+					<input id="mp_consumer_key" class="mp_consumer_key" name="knawat[mp_consumer_key]" type="text" value="<?php if ( $mp_consumer_key != '' ) { echo $mp_consumer_key; } ?>" />
 				</div>
 
-				<div class="knawat_connect_step_2" style="display: block;">
-					<!-- <p><strong><?php _e( 'Step 2', 'dropshipping-woocommerce'); ?></strong></p> -->
-					<a class="merlin__button merlin__button--blue merlin__button--fullwidth merlin__button--popin" onclick="KnawatPopup2();" style="margin-top: 15px; margin-bottom: 10px;">
-						<?php _e( 'Connect with Knawat.com', 'dropshipping-woocommerce'); ?>
-					</a>
+				<div class="key_field">
+					<?php _e( 'Knawat Consumer Secret','dropshipping-woocommerce' ); ?>
+					<input id="mp_consumer_secret" class="mp_consumer_secret" name="knawat[mp_consumer_secret]" type="text" value="<?php if ( $mp_consumer_secret != '' ) { echo $mp_consumer_secret; } ?>" />
 				</div>
-			<?php }else{ ?>
-				<div class="knawat_dropshipwc_connected" style="margin-top: 15px;">
-					<span class="dashicons dashicons-yes" style="background-color: green;color: #fff;border-radius: 50%;padding: 4px 4px 3px 3px;"></span> 
-					<strong style="color: green; font-size: 18px;" > <?php esc_html_e( 'Connected', 'dropshipping-woocommerce' ); ?></strong>
-				</div>
-			<?php } ?>
+
+			</div>
 
 			<input id="knawat-connect-status" type="hidden" name="knawat_status" value="<?php if( $already_setup ){ echo 'connected'; } ?>" required="required" >
 
@@ -1008,18 +1004,30 @@ class Knawat_Merlin {
 			exit( 0 );
 		}
 
-		if( empty( $_POST['kAPIKey'] ) || $_POST['kAPIKey'] != 'connected' ){
+		if( empty( $_POST['kAPIKey'] ) ){
 			wp_send_json(
 				array(
-					'error' => esc_html__( 'Please Complete Process Step 1 & Step 2 for connect your site with Knawat.', 'dropshipping-woocommerce' )
+					'error' => esc_html__( 'Please Insert Knawat Cosumer Key.', 'dropshipping-woocommerce' )
 				)
 			);
 		}
-		
-		$kAPIKey = sanitize_text_field( $_POST['kAPIKey'] );
-		$knawat_options = get_option( KNAWAT_DROPWC_OPTIONS, array() );
-		$knawat_options['knawat_status'] = $kAPIKey;
-		update_option( KNAWAT_DROPWC_OPTIONS, $knawat_options );
+
+		if( empty( $_POST['kAPISecret'] ) ){
+			wp_send_json(
+				array(
+					'error' => esc_html__( 'Please Insert Knawat Cosumer Secret.', 'dropshipping-woocommerce' )
+				)
+			);
+		}
+
+		$current_options = knawat_dropshipwc_get_options();
+		$current_options['mp_consumer_key'] = sanitize_text_field( $_POST['kAPIKey'] );
+		$current_options['mp_consumer_secret'] = sanitize_text_field( $_POST['kAPISecret'] );
+		// Update Options
+		knawat_dropshipwc_update_options( $current_options );
+
+		// Remove knawat_mp_access_channel transient for re-fetch token
+		delete_transient( 'knawat_mp_access_channel' );
 
 		wp_send_json(
 			array(

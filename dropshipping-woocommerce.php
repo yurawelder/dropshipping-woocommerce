@@ -3,7 +3,7 @@
  * Plugin Name:       Knawat WooCommerce DropShipping
  * Plugin URI:        https://wordpress.org/plugins/dropshipping-woocommerce/
  * Description:       Knawat WooCommerce DropShipping
- * Version:           1.2.0
+ * Version:           2.0.0
  * Author:            Knawat Team
  * Author URI:        https://github.com/Knawat
  * License:           GPL-2.0+
@@ -56,9 +56,11 @@ class Knawat_Dropshipping_Woocommerce{
 
 			self::$instance->includes();
 			self::$instance->common = new Knawat_Dropshipping_Woocommerce_Common();
-			self::$instance->admin = new Knawat_Dropshipping_Woocommerce_Admin();
+			self::$instance->admin  = new Knawat_Dropshipping_Woocommerce_Admin();
+			self::$instance->cron   = new Knawat_Dropshipping_WC_Cron();
 			if( self::$instance->is_woocommerce_activated() ){
-				self::$instance->orders = new Knawat_Dropshipping_Woocommerce_Orders();
+				self::$instance->orders    = new Knawat_Dropshipping_Woocommerce_Orders();
+				self::$instance->mp_orders = new Knawat_Dropshipping_WC_MP_Orders();
 			}
 			/**
 			* The code that runs during plugin activation.
@@ -86,14 +88,14 @@ class Knawat_Dropshipping_Woocommerce{
 	 *
 	 * @since 1.0.0
 	 */
-	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
+	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '2.0.0' ); }
 
 	/**
 	 * A dummy magic method to prevent Knawat_Dropshipping_Woocommerce from being unserialized.
 	 *
 	 * @since 1.0.0
 	 */
-	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '1.2.0' ); }
+	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'dropshipping-woocommerce' ), '2.0.0' ); }
 	
 	/**
 	 * Setup plugins constants.
@@ -106,7 +108,7 @@ class Knawat_Dropshipping_Woocommerce{
 
 		// Plugin version.
 		if( ! defined( 'KNAWAT_DROPWC_VERSION' ) ){
-			define( 'KNAWAT_DROPWC_VERSION', '1.2.0' );
+			define( 'KNAWAT_DROPWC_VERSION', '2.0.0' );
 		}
 
 		// Plugin folder Path.
@@ -150,10 +152,13 @@ class Knawat_Dropshipping_Woocommerce{
 		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-webhook.php';
 		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-pdf-invoice.php';
 		if( $this->is_woocommerce_activated() ){
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-api.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-shipment-tracking.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-orders.php';
 			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-admin-dashboard.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-mp-orders.php';
 		}
+		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-cron.php';
 		/**
 		 * Recommended and required plugins.
 		 */
@@ -172,8 +177,13 @@ class Knawat_Dropshipping_Woocommerce{
 	 * @return void
 	 */
 	public function init_includes() {
-		// API
-		require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-handshake.php';
+		if( $this->is_woocommerce_activated() ){
+			// API
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/api/class-dropshipping-woocommerce-handshake.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-woocommerce-importer.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-async-request.php';
+			require_once KNAWAT_DROPWC_PLUGIN_DIR . 'includes/class-dropshipping-wc-background-process.php';
+		}
 	}
 
 	/**
@@ -258,4 +268,34 @@ function run_knawat_dropshipwc_woocommerce() {
 }
 
 // Get Knawat_Dropshipping_Woocommerce Running.
+global $knawatdswc_errors, $knawatdswc_success, $knawatdswc_warnings;
 $GLOBALS['knawat_dropshipwc'] = run_knawat_dropshipwc_woocommerce();
+$knawatdswc_errors = $knawatdswc_success = $knawatdswc_warnings = array();
+
+/**
+ * The code that runs during plugin activation.
+ *
+ * Add Hourly Scheduled import
+ *
+ * @since 2.0.0
+ */
+function knawat_dropshipwc_activate_knawatdswc() {
+	if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
+		// Add Hourly Scheduled import.
+        wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+    }
+}
+register_activation_hook( __FILE__, 'knawat_dropshipwc_activate_knawatdswc' );
+
+/**
+ * The code that runs during plugin deactivation.
+ *
+ * Remove Hourly Scheduled import
+ *
+ * @since 2.0.0
+ */
+function knawat_dropshipwc_deactivate_knawatdswc() {
+	// Remove Hourly Scheduled import
+	wp_clear_scheduled_hook( 'knawat_dropshipwc_run_product_import' );
+}
+register_deactivation_hook( __FILE__, 'knawat_dropshipwc_deactivate_knawatdswc' );

@@ -48,7 +48,7 @@ $knawat_setup = new Knawat_Merlin(
 		
 		'knawat-header' 			=> esc_html__( 'Connect Your store with Knawat' , 'dropshipping-woocommerce' ),
 		'knawat-header-success' 		=> esc_html__( 'You\'re good to go!' , 'dropshipping-woocommerce' ),
-		'knawat' 			=> esc_html__( 'Please follow Step 1 & Step 2 then after to connect you site with Knawat' , 'dropshipping-woocommerce' ),
+		'knawat' 			=> esc_html__( 'Please insert Knawat Knawat Consumer Key and Secret.' , 'dropshipping-woocommerce' ),
 		'knawat-success%s' 		=> esc_html__( 'Your store has already connected to Knawat.' , 'dropshipping-woocommerce' ),
 		'knawat-action-link' 		=> esc_html__( 'Learn about child themes' , 'dropshipping-woocommerce' ),
 		

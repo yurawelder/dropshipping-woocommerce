@@ -178,3 +178,40 @@
 	content:'\e013';
 	color:#a00
 }
+
+.knawat_setting_bar{
+	background-color: #f9f9f9;
+	margin-bottom: 10px;
+	padding: 6px 0 6px 12px;
+}
+
+.knawatds_element.submit_button{
+	margin-top: 10px;
+}
+
+.knawat_dropshipwc_row .connection_wrap.success{
+	color: green;
+	font-weight: bold;
+}
+
+.knawat_dropshipwc_row .connection_wrap span.dashicons-yes{
+	background: green;
+	color: #fff;
+	padding: 2px 2px 0px 0px;
+	border-radius: 50%;
+	margin-right: 2px;
+}
+
+.knawat_dropshipwc_row .connection_wrap.error{
+	color: red;
+	font-weight: bold;
+}
+
+.knawat_dropshipwc_row .connection_wrap span.dashicons-dismiss{
+	padding: 1px 0px 1px 1px;
+}
+
+/* Hide Admin Knawat DropShippinh Submenu */
+li#toplevel_page_knawat_dropship ul.wp-submenu{
+	display: none;
+}

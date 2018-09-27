@@ -2333,3 +2333,8 @@ body.exiting .merlin__content--content .merlin__content__footer {
 p#knawat-connect-text.error {
     color: red;
 }
+
+.key_field input[type="text"]{
+	width: 100%;
+	margin-bottom: 20px;
+}

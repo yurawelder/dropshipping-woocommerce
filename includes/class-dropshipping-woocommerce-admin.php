@@ -41,6 +41,14 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		add_action( 'load-edit.php', array( $this, 'knawat_dropshipwc_load_custom_knawat_order_filter' ) );
 		add_filter( 'admin_footer_text', array( $this, 'add_dropshipping_woocommerce_credit' ) );
 		add_action( 'woocommerce_admin_order_data_after_order_details', array( $this, 'knawat_dropshipwc_add_knawat_order_status_in_backend' ), 10 );
+		add_action( 'admin_init', array( $this, 'add_default_category_notice' ) );
+
+		// Display admin notices.
+		add_action( 'admin_notices', array( $this, 'display_notices') );
+		// Start Manual import.
+		add_action( 'admin_post_knawatds_manual_import', array( $this, 'knawat_start_manual_product_import') );
+		// Stop import.
+		add_action( 'admin_post_knawatds_stop_import', array( $this, 'knawat_stop_product_import') );
 
 		// Add Knawat Order Status column to order list table
 		add_filter( 'manage_shop_order_posts_columns', array( $this, 'knawat_dropshipwc_shop_order_columns' ), 20 );
@@ -52,6 +60,12 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		// Add & Save Product Variation Dropshipper and Quantity
 		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'knawat_dropshipwc_add_dropshipper_field' ), 10, 3 );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'knawat_dropshipwc_save_dropshipper_field' ), 10, 2 );
+
+		// Handle Cron Schedule for existing users.
+		add_action( 'admin_init', array( $this, 'knawat_dropshipwc_maybe_update' ) );
+
+		// Pull Order information from knawat.com
+		add_action( 'current_screen', array( $this, 'knawat_dropshipwc_update_knawat_order' ), 99 );
 	}
 
 	/**
@@ -82,32 +96,53 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	 * @return void
 	 */
 	function admin_page() {
-		
+
 		?>
 		<div class="wrap">
-		    <h1><?php esc_html_e( 'Knawat Dropshipping', 'dropshipping-woocommerce' ); ?></h1>
-		    <h2><?php esc_html_e( 'Settings', 'dropshipping-woocommerce' ); ?></h2>
-		    <?php
-		    // Set Default Tab to Import.
-		    $tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'settings';
-		    ?>
-		    <div id="poststuff">
-		        <div id="post-body" class="metabox-holder columns-2">
+			<h1><?php esc_html_e( 'Knawat Dropshipping', 'dropshipping-woocommerce' ); ?></h1>
+			<?php
+			// Set Default Tab to Import.
+			$tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'import';
+			$consumer_keys = knawat_dropshipwc_get_consumerkeys();
+			if( empty( $consumer_keys ) ){
+				$tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'settings';
+			}
+			?>
+			<div id="poststuff">
+				<div id="post-body" class="metabox-holder columns-2">
 
-		            <div id="postbox-container-1" class="postbox-container">
-		            	<?php //require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin-sidebar.php'; ?>
-		            </div>
-		            <div id="postbox-container-2" class="postbox-container">
+					<div id="postbox-container-1" class="postbox-container">
+						<?php //require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin-sidebar.php'; ?>
+					</div>
+					<div id="postbox-container-2" class="postbox-container">
 
-		                <div class="dropshipping-woocommerce-page">
-		                	<?php
-		                		require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/dropshipping-woocommerce-admin-page.php';
-			                ?>
-		                	<div style="clear: both"></div>
-		                </div>
-		        	</div>
-		        
-		    </div>
+						<h1 class="nav-tab-wrapper">
+							<a href="<?php echo esc_url( add_query_arg( 'tab', 'import', $this->adminpage_url ) ); ?>" class="nav-tab <?php if ( $tab == 'import' ) { echo 'nav-tab-active'; } ?>">
+								<?php esc_html_e( 'Product Import', 'dropshipping-woocommerce' ); ?>
+							</a>
+
+							<a href="<?php echo esc_url( add_query_arg( 'tab', 'settings', $this->adminpage_url ) ); ?>" class="nav-tab <?php if ( $tab == 'settings' ) { echo 'nav-tab-active'; } ?>">
+								<?php esc_html_e( 'Settings', 'dropshipping-woocommerce' ); ?>
+							</a>
+						</h1>
+
+						<div class="dropshipping-woocommerce-page">
+							<?php
+							if ( 'import' === $tab ) {
+
+								require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin/dropshipping-woocommerce-import.php';
+
+							} elseif ( 'settings' === $tab ) {
+
+								require_once KNAWAT_DROPWC_PLUGIN_DIR . '/templates/admin/dropshipping-woocommerce-settings.php';
+
+							}
+							?>
+							<div style="clear: both"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
@@ -290,6 +325,10 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function enqueue_admin_scripts( $hook ) {
 		$js_dir  = KNAWAT_DROPWC_PLUGIN_URL . 'assets/js/';
 		wp_register_script( 'dropshipping-woocommerce', $js_dir . 'dropshipping-woocommerce-admin.js', array('jquery' ), KNAWAT_DROPWC_VERSION );
+		$params = array(
+			'nonce' => wp_create_nonce('kdropshipping_nonce'),
+		);
+		wp_localize_script( 'dropshipping-woocommerce', 'kdropshipping_object', $params );
 		wp_enqueue_script( 'dropshipping-woocommerce' );
 		
 	}
@@ -306,6 +345,121 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function enqueue_admin_styles( $hook ) {
 		$css_dir  = KNAWAT_DROPWC_PLUGIN_URL . 'assets/css/';
 		wp_enqueue_style('dropshipping-woocommerce', $css_dir . 'dropshipping-woocommerce-admin.css', false, "" );
+	}
+
+	/**
+	 * Display notices in admin.
+	 *
+	 * @since    2.0.0
+	 */
+	public function display_notices() {
+		global $knawatdswc_errors, $knawatdswc_success, $knawatdswc_warnings;
+
+		if ( ! empty( $knawatdswc_errors ) ) {
+			foreach ( $knawatdswc_errors as $error ) :
+			    ?>
+			    <div class="notice notice-error is-dismissible">
+			        <p><?php echo $error; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
+		if ( ! empty( $knawatdswc_success ) ) {
+			foreach ( $knawatdswc_success as $success ) :
+			    ?>
+			    <div class="notice notice-success is-dismissible">
+			        <p><?php echo $success; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
+		if ( ! empty( $knawatdswc_warnings ) ) {
+			foreach ( $knawatdswc_warnings as $warning ) :
+			    ?>
+			    <div class="notice notice-warning is-dismissible">
+			        <p><?php echo $warning; ?></p>
+			    </div>
+			    <?php
+			endforeach;
+		}
+
+		if( isset( $_GET['manual_run']) && isset( $_GET['tab'] ) && '1' === $_GET['manual_run'] && 'import' === $_GET['tab'] ){
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Manual import started successfully.','dropshipping-woocommerce' ); ?></p>
+			</div>
+			<?php
+		}
+
+		if( isset( $_GET['manual_run']) && isset( $_GET['tab'] ) && '0' === $_GET['manual_run'] && 'import' === $_GET['tab'] ){
+			?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php _e( 'Something went wrong during start manual import.','dropshipping-woocommerce' ); ?></p>
+			</div>
+			<?php
+		}
+
+		if ( isset( $_GET['order_sync'] ) ) {
+			if ( '1' === $_GET['order_sync'] ) {
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php esc_attr_e( 'Order(s) has been synchronized successfully.','dropshipping-woocommerce' ); ?></p>
+				</div>
+				<?php
+			} else {
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p><?php esc_attr_e( 'Something went wrong during order synchronization, please try again.','dropshipping-woocommerce' ); ?></p>
+				</div>
+				<?php
+			}
+		}
+	}
+
+	/**
+	 * Manually Start product import.
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_start_manual_product_import() {
+		if( wp_verify_nonce( $_GET['manual_nonce'], 'knawatds_manual_import_action') ){
+			global $knawatdswc_errors;
+			do_action( 'knawat_dropshipwc_run_product_import' );
+
+			if( empty( $knawatdswc_errors ) ){
+				$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import', 'manual_run' => '1' ), $this->adminpage_url ) );
+				wp_redirect(  $redirect_url );
+				exit();
+			}
+		}
+		$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import', 'manual_run' => '0' ), $this->adminpage_url ) );
+		wp_redirect(  $redirect_url );
+		exit();
+	}
+
+	/**
+	 * Stop product import.
+	 *
+	 * @since    2.0.0
+	 */
+	public function knawat_stop_product_import() {
+		if( wp_verify_nonce( sanitize_key( $_GET['stop_import_nonce'] ), 'knawatds_stop_import_action') ){
+
+			if ( class_exists( 'Knawat_Dropshipping_WC_Background', false ) ) {
+				$import_process = new Knawat_Dropshipping_WC_Background();
+				// Kill Import
+				$import_process->kill_process();
+				set_transient( 'knawat_stop_import', 'product_import', 20 );
+			}
+			$messages = array();
+			$messages['success'][] = esc_attr__( 'Import has been stopped successfully.', 'dropshipping-woocommerce' );
+			knawat_set_notices($messages);
+		}
+		$redirect_url = esc_url_raw( add_query_arg( array( 'tab' => 'import' ), $this->adminpage_url ) );
+		wp_safe_redirect(  $redirect_url );
+		exit();
 	}
 
 	/**
@@ -395,11 +549,7 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 	public function knawat_dropshipwc_add_knawat_cost_field( $loop, $variation_data, $variation ){
 		$knawat_cost = get_post_meta( $variation->ID, '_knawat_cost', true );
 		if( !empty( $knawat_cost ) ){
-			$label = sprintf(
-				/* translators: %s: currency symbol */
-				__( 'Knawat Cost (%s)', 'dropshipping-woocommerce' ),
-				get_woocommerce_currency_symbol()
-			);
+			$label = __( 'Knawat Cost ($)', 'dropshipping-woocommerce' );
 			?>
 			<p class="form-field knawat_dropshipwc_knawat_cost form-row form-row-first">
 				<label for="knawat_cost<?php echo $loop; ?>"><?php echo $label; ?></label>
@@ -491,6 +641,82 @@ class Knawat_Dropshipping_Woocommerce_Admin {
 		if( isset( $_POST['localds_stock'][$variation_id] ) ){
 			$localds_stock = isset( $_POST['localds_stock'][$variation_id] ) ? absint( $_POST['localds_stock'][$variation_id] ) : 0;
 			update_post_meta( $variation_id, '_localds_stock', $localds_stock );
+		}
+	}
+
+	/**
+	 * Check if update actions needed and perform if needed
+	 *
+	 * @return void
+	 */
+	public function knawat_dropshipwc_maybe_update(){
+		$installed_version = get_option( 'knawat_dropwc_version', '1.2.0' );
+
+		if ( version_compare( $installed_version, KNAWAT_DROPWC_VERSION, '<' ) ) {
+			if ( version_compare( $installed_version, '2.0.0', '<' ) ) {
+				if( !wp_next_scheduled( 'knawat_dropshipwc_run_product_import' ) ) {
+					// Add Hourly Scheduled import.
+					wp_schedule_event( time(), 'hourly', 'knawat_dropshipwc_run_product_import' );
+				}
+				// Delete Deprecated webhooks.
+				knawat_dropshipwc_delete_deprecated_webhooks();
+				// Delete Deprecated API Keys.
+				knawat_dropshipwc_delete_deprecated_api_keys();
+			}
+			update_option( 'knawat_dropwc_version', KNAWAT_DROPWC_VERSION );
+		}
+	}
+
+	/**
+	 * Set notice on Settings page for select default WooCommerce Category.
+	 *
+	 * @since 2.0
+	 * @return void
+	 */
+	public function add_default_category_notice() {
+		global $knawat_dropshipwc, $knawatdswc_warnings;
+		if ( isset( $_GET[ 'page' ] ) && 'knawat_dropship' === sanitize_text_field( $_GET[ 'page' ] ) && isset( $_GET[ 'tab' ] ) && 'settings' === sanitize_text_field( $_GET[ 'tab' ] ) ) {
+			if( $knawat_dropshipwc->common->is_admin_notice_active('select_default_cat') ){
+				$knawatdswc_warnings[] = sprintf( '%s <a href="#" class="knawat_dismiss_notice" data-noticetype="select_default_cat"> %s</a>', __( 'Before you start importing products, it\'s better to set default category for import Knawat Products. You can set it from <strong>Products > Categories.</strong>  ex: New arrivals, or something else as you want.', 'dropshipping-woocommerce' ), __('Dismiss this notice.', 'dropshipping-woocommerce' ));
+			}
+		}
+	}
+
+	/**
+	 * Pull knawat order information from Knawat.com
+	 *
+	 * @since 2.0
+	 * @return void
+	 */
+	public function knawat_dropshipwc_update_knawat_order( $current_screen = '' ){
+		if( $current_screen->base == 'post' && $current_screen->id == 'shop_order' ){
+			$order_id = 0;
+			if ( isset( $_GET['post'] ) ) {
+				$order_id = (int) $_GET['post'];
+			} elseif ( isset( $_POST['post_ID'] ) ) {
+				$order_id = (int) $_POST['post_ID'];
+			}
+
+			if( $order_id > 0 ){
+				$order = wc_get_order( $order_id );
+				if ( empty( $order ) ) {
+					return;
+				}
+				$is_knawat = get_post_meta( $order_id, '_knawat_order', true );
+				$knawat_order_id = get_post_meta( $order_id, '_knawat_order_id', true );
+				if ( 1 == $is_knawat && $knawat_order_id != '' ) {
+					if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) ) {
+						return;
+					}
+					// Async Order Update.
+					$async_request = new Knawat_Dropshipping_WC_Async_Request();
+					$async_request->data( array( 'operation' => 'pull_order', 'knawat_order_id' => $knawat_order_id, 'order_id' => $order_id ) );
+					$temp = $async_request->dispatch();
+				}
+			}
+		} elseif( $current_screen->base == 'edit' && $current_screen->id == 'edit-shop_order'  ){
+			// Fire Pull Order hook.
+			do_action( 'knawat_dropshipwc_run_pull_orders' );
 		}
 	}
 }

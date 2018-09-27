@@ -35,6 +35,11 @@ class Knawat_Dropshipping_Woocommerce_Admin_Dashboard {
 	 */
 	public function init() {
 		wp_add_dashboard_widget( 'knawat_dropshipwc_dashboard_status', __( 'Knawat status', 'dropshipping-woocommerce' ), array( $this, 'status_widget' ) );
+		wp_add_dashboard_widget(
+			'knawat_latest_news_widget',
+			esc_html__( 'Latest News from Knawat', 'dropshipping-woocommerce' ),
+			array($this, 'render_knawat_latest_news_widget' )
+		);
 	}
 
 	/**
@@ -342,6 +347,24 @@ class Knawat_Dropshipping_Woocommerce_Admin_Dashboard {
 			}
 		}
 		return $args;
+	}
+
+	/**
+	 * Render the Knawat Latest New Widget.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function render_knawat_latest_news_widget() {
+		echo '<div class="knawat-latest-news-widget">';
+		wp_widget_rss_output(
+			'https://knawat.com/feed/',
+			array(
+				'items'			=> 5,
+				'show_summary'	=> 1,
+				'show_date'		=> 1
+			) );
+		echo '</div>';
 	}
 
 }
