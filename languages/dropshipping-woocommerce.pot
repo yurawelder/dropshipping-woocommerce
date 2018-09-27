@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Knawat WooCommerce DropShipping 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dropshipping-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-09-11 06:46:28+00:00\n"
+"POT-Creation-Date: 2018-09-27 11:50:24+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,15 +36,15 @@ msgstr ""
 msgid "Order synchronize fail. order id: #%d"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:328
+#: includes/class-dropshipping-wc-mp-orders.php:344
 msgid "Some orders are not sycronized with knawat.com. Please"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:329
+#: includes/class-dropshipping-wc-mp-orders.php:345
 msgid "synchronize it now"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:375
+#: includes/class-dropshipping-wc-mp-orders.php:391
 msgid "Nonce failed. Please try again."
 msgstr ""
 
@@ -158,35 +158,34 @@ msgstr ""
 msgid "Knawat Status"
 msgstr ""
 
-#. translators: %s: currency symbol
-#: includes/class-dropshipping-woocommerce-admin.php:554
-msgid "Knawat Cost (%s)"
+#: includes/class-dropshipping-woocommerce-admin.php:552
+msgid "Knawat Cost ($)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:611
+#: includes/class-dropshipping-woocommerce-admin.php:607
 msgid "Dropshipper"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:614
+#: includes/class-dropshipping-woocommerce-admin.php:610
 msgid "Select Dropshipper for this Product variantion."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:622
+#: includes/class-dropshipping-woocommerce-admin.php:618
 msgid "Stock quantity (Dropshipper)"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:624
+#: includes/class-dropshipping-woocommerce-admin.php:620
 msgid "Enter a quantity of product variant for selected dropshipper."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:678
+#: includes/class-dropshipping-woocommerce-admin.php:680
 msgid ""
 "Before you start importing products, it's better to set default category for "
 "import Knawat Products. You can set it from <strong>Products > Categories.</"
 "strong>  ex: New arrivals, or something else as you want."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-admin.php:678
+#: includes/class-dropshipping-woocommerce-admin.php:680
 msgid "Dismiss this notice."
 msgstr ""
 
@@ -235,45 +234,45 @@ msgid ""
 "later."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:294
+#: includes/class-dropshipping-woocommerce-orders.php:299
 msgid "Order &ndash; %s"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:294
+#: includes/class-dropshipping-woocommerce-orders.php:299
 msgctxt "Order date parsed by strftime"
 msgid "%b %d, %Y @ %I:%M %p"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:721
+#: includes/class-dropshipping-woocommerce-orders.php:726
 msgctxt "Admin: Order table column"
 msgid "Suborders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:811
+#: includes/class-dropshipping-woocommerce-orders.php:816
 msgid "Suborders"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:813
+#: includes/class-dropshipping-woocommerce-orders.php:818
 msgid "Parent order"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:819
+#: includes/class-dropshipping-woocommerce-orders.php:824
 msgid "Knawat Dropshipper"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:864
+#: includes/class-dropshipping-woocommerce-orders.php:869
 msgid "Return to main order"
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1062
+#: includes/class-dropshipping-woocommerce-orders.php:1067
 msgid "Mark main order completed when all suborders are completed."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1068
+#: includes/class-dropshipping-woocommerce-orders.php:1073
 msgid "Mark main order refunded when all suborders are refunded."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-orders.php:1448
+#: includes/class-dropshipping-woocommerce-orders.php:1453
 msgid "%1$s stock reduced for \"%2$s\" from %3$s to %4$s."
 msgstr ""
 
