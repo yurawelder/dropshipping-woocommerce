@@ -58,10 +58,16 @@ Knawat WooCommerce DropShipping allows you to Add products to your WooCommerce s
 <strong>MAJOR UPDATE</strong>
 
 * ADDED: Refactored Plugin as per New product import flow.
-* DEPRECATED: Old Product Import flow.
-* ADDED: Hourly Background Product Import from Knawat.
-* ADDED: Auto Order Synchronization with Knawat.
-* IMPROVEMENT: Some Improvements
+* ADDED: Hourly background Product Import from Knawat.
+* ADDED: New button to force pull all products.
+* ADDED: Instantly update product qty & price before order placed.
+* ADDED: Background Order Synchronization with Knawat.
+* ADDED: Knawat Order Status for know status of order at Knawat.
+* ADDED: Support for Autoupdate Order Tracking Number and Carrier Data to Order once Order Shipped.
+* ADDED: Option for Track Order at Front-end Order Screen.
+* ADDED: Added Support for Dokan Multivendor Marketplace Plugin.
+* IMPROVEMENT: 80% Faster and Accurate product update.
+* IMPROVEMENT: Some Other Performance & UI/UX Improvements
 * FIXED: some bug fixes.
 
 = 1.2.0 =
