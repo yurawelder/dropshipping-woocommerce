@@ -160,6 +160,22 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					if( isset( $formated_data['id'] ) && !$this->params['force_update'] ){
 						// Fake it
 						$result = array( 'id' => $formated_data['id'], 'updated' => true );
+						if( isset( $formated_data['raw_attributes'] ) && !empty( $formated_data['raw_attributes'] ) ){
+							foreach ($formated_data['raw_attributes'] as $attkey => $attvalue) {
+								if ( ! empty( $attvalue['taxonomy'] ) ) {
+									$options = $this->get_existing_attribute_values( $formated_data['id'], $attvalue['name'] );
+									if( !empty( $attvalue['value'] ) ){
+										foreach ($attvalue['value'] as $opt ) {
+											if( !in_array( $opt, $options ) ){
+												$options[] = $opt;
+											}
+										}
+									}
+									$formated_data['raw_attributes'][$attkey]['value'] = $options;
+								}
+							}
+							$result = $this->process_item( $formated_data );
+						}
 					}else{
 						if( $total_qty > 0 ){
 							add_filter( 'woocommerce_new_product_data', array( $this, 'set_dokan_seller' ) );
@@ -312,7 +328,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			foreach ( $product->variations as $variation ) {
 				$temp_variant = array();
 				$varient_id = wc_get_product_id_by_sku( $variation->sku );
-				if ( $varient_id ) {
+				if ( $varient_id && $varient_id > 0 ) {
 					$temp_variant['id'] = $varient_id;
 				}else{
 					$temp_variant['sku']  = $variation->sku;
@@ -322,32 +338,23 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 				// Add Meta Data.
 				$temp_variant['meta_data'] = array();
-
-				if( $product_id && !$this->params['force_update'] ){
-
-					if( is_numeric( $variation->sale_price ) ){
-						$temp_variant['price'] = wc_format_decimal( $variation->sale_price );
-					}
-					if( is_numeric( $variation->market_price ) ){
-						$temp_variant['regular_price'] = wc_format_decimal( $variation->market_price );
-					}
-					if( is_numeric( $variation->sale_price ) ){
-						$temp_variant['sale_price'] = wc_format_decimal( $variation->sale_price );
-					}
-					$temp_variant['manage_stock'] = true;
-					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
-				}else{
-
+				if( is_numeric( $variation->sale_price ) ){
 					$temp_variant['price'] = wc_format_decimal( $variation->sale_price );
+				}
+				if( is_numeric( $variation->market_price ) ){
 					$temp_variant['regular_price'] = wc_format_decimal( $variation->market_price );
+				}
+				if( is_numeric( $variation->sale_price ) ){
 					$temp_variant['sale_price'] = wc_format_decimal( $variation->sale_price );
-					if( isset( $variation->quantity ) ){
-						$temp_variant['manage_stock'] = true;
-					}
-					$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
-					$temp_variant['weight'] = wc_format_decimal( $variation->weight );
-					$temp_variant['meta_data'][] = array( 'key' => '_knawat_cost', 'value' => wc_format_decimal( $variation->cost_price ) );
+				}
+				$temp_variant['manage_stock'] = true;
+				$temp_variant['stock_quantity'] = $this->parse_stock_quantity_field( $variation->quantity );
+				$temp_variant['meta_data'][] = array( 'key' => '_knawat_cost', 'value' => wc_format_decimal( $variation->cost_price ) );
 
+				if( $varient_id && $varient_id > 0 && !$this->params['force_update'] ){
+					// Update Data for existing Variend Here.
+				}else{
+					$temp_variant['weight'] = wc_format_decimal( $variation->weight );
 					if( isset( $variation->attributes ) && !empty( $variation->attributes ) ){
 						foreach ( $variation->attributes as $attribute ) {
 							/*///////////////////////////////////////////*/
@@ -482,6 +489,51 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			}
 		}
 		return $product_data;
+	}
+
+	/**
+	 * Get Existing Attribute options by product ID and Attribute name.
+	 *
+	 * @since 2.0.1
+	 * @param array $product_id Product ID for get attribute options
+	 * @param array $attribute_name Attribute name for get attribute options
+	 * @return array $terms Attribute options
+	 */
+	function get_existing_attribute_values( $product_id, $attribute_name ){
+		if(empty( $product_id) || empty( $attribute_name ) ){
+			return array();
+		}
+		$terms = array();
+
+		$attribute_id = $this->get_attribute_taxonomy_id( $attribute_name );
+		// Get name.
+		$attribute_name = $attribute_id ? wc_attribute_taxonomy_name_by_id( $attribute_id ) : $attribute_name;
+
+		$product = wc_get_product($product_id);
+		$existing_attributes = $product->get_attributes();
+		if ( !empty( $existing_attributes ) && !empty( $product ) ) {
+			foreach ( $existing_attributes as $existing_attribute ) {
+				if ( $existing_attribute->get_name() === $attribute_name ) {
+					if ( taxonomy_exists( $attribute_name ) ) {
+						foreach ( $existing_attribute->get_options() as $option ) {
+							if ( is_int( $option ) ) {
+								$term = get_term_by( 'id', $option, $attribute_name );
+							} else {
+								$term = get_term_by( 'name', $option, $attribute_name );
+								if ( ! $term || is_wp_error( $term ) ) {
+									$new_term = wp_insert_term( $option, $attribute_name );
+									$term     = is_wp_error( $new_term ) ? false : get_term_by( 'id', $new_term['term_id'], $attribute_name );
+								}
+							}
+							if ( $term && ! is_wp_error( $term ) && isset( $term->name)) {
+								$terms[] = $term->name;
+							}
+						}
+					}
+				}
+			}
+		}
+		return $terms;
 	}
 }
 
