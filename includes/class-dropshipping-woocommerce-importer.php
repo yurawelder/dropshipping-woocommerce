@@ -249,6 +249,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			return $product;
 		}
 		$active_langs = array();
+		$attributes = array();
 		$default_lang = get_locale();
 		$default_lang = explode( '_', $default_lang );
 		$default_lang = $default_lang[0];
@@ -320,10 +321,37 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					$new_product['raw_gallery_image_ids'] = $images;
 				}
 			}
+
+			if( isset( $product->attributes ) && !empty( $product->attributes ) ){
+				foreach ( $product->attributes as $attribute ) {
+					$attribute_name = isset( $attribute->name ) ? $this->attribute_languagfy($attribute->name ) : '';
+					$attribute_options = array();
+					if( isset( $attribute->options ) && !empty( $attribute->options ) ){
+						foreach ($attribute->options as $attributevalue) {
+							$attribute_formated = $this->attribute_languagfy( $attributevalue );
+							if( !in_array( $attribute_formated, $attribute_options ) && !empty( $attribute_formated ) ){
+								$attribute_options[] = $attribute_formated;
+							}
+						}
+					}
+					// continue if no attribute name found.
+					if( $attribute_name == '' ){
+						continue;
+					}
+
+					if( isset( $attributes[ $attribute_name ] ) ){
+						if( !empty( $attribute_options ) ){
+							$attributes[ $attribute_name ] = array_unique( array_merge( $attributes[ $attribute_name ], $attribute_options ) );
+						}
+					}else{
+						$attributes[ $attribute_name ] = $attribute_options;
+					}
+				}
+			}
 		}
 
 		$variations = array();
-		$attributes = array();
+		$var_attributes = array();
 		if( isset( $product->variations ) && !empty( $product->variations ) ){
 			foreach ( $product->variations as $variation ) {
 				$temp_variant = array();
@@ -357,19 +385,8 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 					$temp_variant['weight'] = wc_format_decimal( $variation->weight );
 					if( isset( $variation->attributes ) && !empty( $variation->attributes ) ){
 						foreach ( $variation->attributes as $attribute ) {
-							/*///////////////////////////////////////////*/
-							/////// @TODO: Add MULTILINGUAL SUPPORT ///////
-							/*///////////////////////////////////////////*/
-							$temp_attribute_name = isset( $attribute->name->en ) ? $attribute->name->en : '';
-							$temp_attribute_value = isset( $attribute->option->en ) ? $attribute->option->en : '';
-
-							// if attribute name is blank then take a chance for TR.
-							if( $temp_attribute_name == '' ){
-								$temp_attribute_name = isset( $attribute->name->tr ) ? $attribute->name->tr : '';
-							}
-							if( $temp_attribute_value == '' ){
-								$temp_attribute_value = isset( $attribute->option->tr ) ? $attribute->option->tr : '';
-							}
+							$temp_attribute_name = isset( $attribute->name ) ? $this->attribute_languagfy($attribute->name ) : '';
+							$temp_attribute_value = isset( $attribute->option ) ? $this->attribute_languagfy($attribute->option ) : '';
 
 							// continue if no attribute name found.
 							if( $temp_attribute_name == '' ){
@@ -381,6 +398,9 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 							$temp_var_attribute['value'] = array( $temp_attribute_value );
 							$temp_var_attribute['taxonomy'] = true;
 							$temp_variant['raw_attributes'][] = $temp_var_attribute;
+
+							// Add attribute name to $var_attributes for make it taxonomy.
+							$var_attributes[] = $temp_attribute_name;
 
 							if( isset( $attributes[ $temp_attribute_name ] ) ){
 								if( !in_array( $temp_attribute_value, $attributes[ $temp_attribute_name ] ) ){
@@ -401,14 +421,86 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 				$temp_raw = array();
 				$temp_raw['name'] = $name;
 				$temp_raw['value'] = $value;
-				$temp_raw['taxonomy'] = true;
 				$temp_raw['visible'] = true;
-				$temp_raw['default'] = isset( $value[0] ) ? $value[0] : '';
+				if( in_array( $name, $var_attributes ) ){
+					$temp_raw['taxonomy'] = true;
+					$temp_raw['default'] = isset( $value[0] ) ? $value[0] : '';
+				}
 				$new_product['raw_attributes'][] = $temp_raw;
 			}
 		}
 		$new_product['variations'] = $variations;
 		return $new_product;
+	}
+
+	/**
+	 * Set variation data.
+	 *
+	 * @param WC_Product $variation Product instance.
+	 * @param array      $data    Item data.
+	 * @return WC_Product|WP_Error
+	 * @throws Exception If data cannot be set.
+	 */
+	protected function set_variation_data( &$variation, $data ) {
+		$parent = false;
+
+		// Check if parent exist.
+		if ( isset( $data['parent_id'] ) ) {
+			$parent = wc_get_product( $data['parent_id'] );
+
+			if ( $parent ) {
+				$variation->set_parent_id( $parent->get_id() );
+			}
+		}
+
+		// Stop if parent does not exists.
+		if ( ! $parent ) {
+			return new WP_Error( 'woocommerce_product_importer_missing_variation_parent_id', __( 'Variation cannot be imported: Missing parent ID or parent does not exist yet.', 'dropshipping-woocommerce' ), array( 'status' => 401 ) );
+		}
+
+		if ( isset( $data['raw_attributes'] ) ) {
+			$attributes        = array();
+			$parent_attributes = $this->get_variation_parent_attributes( $data['raw_attributes'], $parent );
+
+			foreach ( $data['raw_attributes'] as $attribute ) {
+				$attribute_id = 0;
+
+				// Get ID if is a global attribute.
+				if ( ! empty( $attribute['taxonomy'] ) ) {
+					$attribute_id = $this->get_attribute_taxonomy_id( $attribute['name'] );
+				}
+
+				if ( $attribute_id ) {
+					$attribute_name_raw = wc_attribute_taxonomy_name_by_id( $attribute_id );
+					$attribute_name = sanitize_title( $attribute_name_raw );
+				} else {
+					$attribute_name_raw = sanitize_title( $attribute['name'] );
+					$attribute_name = sanitize_title( $attribute['name'] );
+				}
+
+				if ( ! isset( $parent_attributes[ $attribute_name ] ) || ! $parent_attributes[ $attribute_name ]->get_variation() ) {
+					continue;
+				}
+
+				$attribute_key   = sanitize_title( $parent_attributes[ $attribute_name ]->get_name() );
+				$attribute_value = isset( $attribute['value'] ) ? current( $attribute['value'] ) : '';
+
+				if ( $parent_attributes[ $attribute_name ]->is_taxonomy() ) {
+					// If dealing with a taxonomy, we need to get the slug from the name posted to the API.
+					$term = get_term_by( 'name', $attribute_value, $attribute_name_raw );
+
+					if ( $term && ! is_wp_error( $term ) ) {
+						$attribute_value = $term->slug;
+					} else {
+						$attribute_value = sanitize_title( $attribute_value );
+					}
+				}
+
+				$attributes[ $attribute_key ] = $attribute_value;
+			}
+
+			$variation->set_attributes( $attributes );
+		}
 	}
 
 	/**
@@ -534,6 +626,52 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			}
 		}
 		return $terms;
+	}
+
+	/**
+	 * Get Formated string with qtranslate-X languege wrappers for lang object.
+	 *
+	 * @since 2.0.1
+	 * @param array $lang_object Object of values with lang keys
+	 * @return string $formated_value Formated string with language wrappers.
+	 */
+	function attribute_languagfy( $lang_object ){
+		if(empty( $lang_object ) ){
+			return $lang_object;
+		}
+		$active_langs = array();
+		$default_lang = get_locale();
+		$default_lang = explode( '_', $default_lang );
+		$default_lang = $default_lang[0];
+		$active_plugins = knawat_dropshipwc_get_activated_plugins();
+		if( $active_plugins['qtranslate-x'] ){
+			global $q_config;
+			$default_lang = isset( $q_config['default_language'] ) ? sanitize_text_field( $q_config['default_language']  ) : $default_lang;
+			$active_langs = isset( $q_config['enabled_languages'] ) ? $q_config['enabled_languages'] : array();
+		}
+
+		$formated_value = isset( $lang_object->$default_lang ) ? sanitize_text_field( $lang_object->$default_lang ) : '';
+		// if attribute name is blank then take a chance for EN.
+		if( $formated_value == '' ){
+			$formated_value = isset( $lang_object->en ) ? $lang_object->en : '';
+		}
+		// if attribute name is blank then take a chance for TR.
+		if( $formated_value == '' ){
+			$formated_value = isset( $lang_object->tr ) ? $lang_object->tr : '';
+		}
+
+		if( $active_plugins['qtranslate-x'] && !empty( $active_langs ) ){
+			$formated_value = '';
+			foreach ( $active_langs as $active_lang ) {
+				if( isset( $lang_object->$active_lang ) ){
+					$formated_value .= '[:'.$active_lang.']'.$lang_object->$active_lang;
+				}
+			}
+			if( $formated_value != ''){
+				$formated_value .= '[:]';
+			}
+		}
+		return $formated_value;
 	}
 }
 
