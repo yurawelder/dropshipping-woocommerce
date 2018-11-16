@@ -254,6 +254,9 @@ class Knawat_Dropshipping_WC_MP_Orders {
 		} elseif( $payment_method_title != ''){
 			$payment_method = $payment_method_title;
 		}
+		if( empty( $payment_method ) ){
+			$payment_method = 'default '.__('(Knawat Payment Method)', 'dropshipping-woocommerce' );
+		}
 
 		$new_order['payment_method'] = $payment_method;
 
