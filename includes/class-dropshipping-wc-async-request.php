@@ -52,6 +52,14 @@ class Knawat_Dropshipping_WC_Async_Request extends WP_Async_Request {
 				global $knawat_dropshipwc;
 				$knawat_dropshipwc->common->knawat_delete_mp_product_by_sku( $delete_sku );
 			}
+		} elseif( isset( $_POST['operation'] ) && sanitize_text_field( $_POST['operation'] ) == 'push_order' ){
+			$order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( $_POST['order_id'] ) : '';
+			if( $order_id != '' ){
+				global $knawat_dropshipwc;
+				sleep(5); // Wait for update order by other "woocommerce_update_order" calls
+				$knawat_dropshipwc->mp_orders->knawatds_order_created_updated( $order_id );
+			}
+			return true;
 		}
 
 		// Update Product by SKU

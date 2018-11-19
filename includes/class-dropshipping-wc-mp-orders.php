@@ -33,11 +33,11 @@ class Knawat_Dropshipping_WC_MP_Orders {
 	 */
 	public function __construct() {
 		// Create Order at Front-end.
-		add_action( 'woocommerce_checkout_order_processed', array( $this, 'knawatds_order_created' ), 10 );
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'knawatds_order_created' ), 99 );
 
 		// Create/Update Order.
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'knawatds_order_created_updated' ), 99 );
-		add_action( 'woocommerce_update_order', array( $this, 'knawatds_order_created_updated' ), 99 );
+		add_action( 'woocommerce_update_order', array( $this, 'knawatds_order_syncronize' ), 99 );
 
 		// Handle a custom meta query var to get orders with the custom meta field.
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', array( $this, 'handle_knawatds_custom_query_var' ), 10, 2 );
@@ -485,5 +485,28 @@ class Knawat_Dropshipping_WC_MP_Orders {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Push order to knawat using async fuction call.
+	 *
+	 * @access public
+	 * @since 2.0.1
+	 * @return void
+	 */
+	public function knawatds_order_syncronize( $order_id ){
+		// Only during the first execution of the action woocommerce_update_order
+		if( did_action( 'woocommerce_update_order' ) === 1 ) {
+			if ( ! class_exists( 'Knawat_Dropshipping_WC_Async_Request', false ) || empty($order_id)) {
+				return;
+			}
+
+			// Async Push Order.
+			$data = array( 'operation' => 'push_order', 'order_id'=> $order_id );
+			$async_request = new Knawat_Dropshipping_WC_Async_Request();
+			$async_request->data( $data );
+			$async_request->dispatch();
+		}
+		return;
 	}
 }
