@@ -72,6 +72,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 			'product_index'     => -1, // product index needed incase of memory issuee or timeout
 			'force_update' 	 	=> false, // Whether to force update existing items.
 			'prevent_timeouts' 	=> true,  // Check memory and time usage and abort if reaching limit.
+			'force_full_import'	=> 0,	  // Option for import all products not updated only.
 			'is_complete'		=> false, // Is Import Complete?
 			'products_total'	=> -1,
 			'imported'			=> 0,
@@ -97,7 +98,12 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 
 		switch ( $this->import_type ) {
 			case 'full':
-				$this->data = $this->mp_api->get( 'catalog/products/?limit='.$this->params['limit'].'&page='.$this->params['page'] );
+				$knawat_last_imported = get_option( 'knawat_last_imported', false );
+				$api_url = 'catalog/products/?limit='.$this->params['limit'].'&page='.$this->params['page'];
+				if( !empty( $knawat_last_imported ) && $this->params['force_full_import'] != 1 ){
+					$api_url .= '&lastupdate='.$knawat_last_imported;
+				}
+				$this->data = $this->mp_api->get( $api_url );
 				break;
 
 			case 'single':
