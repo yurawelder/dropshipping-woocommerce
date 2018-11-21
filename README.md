@@ -11,13 +11,14 @@ If you are not a developer, please use the [Knawat plugin page](https://wordpres
 To disclose a security issue to our team, [please submit a report here](https://knawat.com/contact/).
 
 ## Support & Chat
-Developers are welcome here, please create issue or [chat with us https://gitter.im/Knawat/Lobby](https://gitter.im/Knawat/Lobby). This repository is not suitable for Knawat customers support. Please don't use our issue tracker for support requests, but for core Knawat dropshipping plugin issues only. Support can take place through the appropriate channels:
-
-* The [Knawat support portal](https://help.knawat.com/hc/en-us/requests/new/) is available for customers with paid membership.
-* [Our community forum on wp.org](https://wordpress.org/support/plugin/dropshipping-woocommerce/) which is available for all Knawat users.
+Developers are welcome here, please create issue or [chat with us https://gitter.im/Knawat/Lobby](https://gitter.im/Knawat/Lobby). This repository is not suitable for Knawat customers support. Please don't use our issue tracker for support requests, but for core Knawat dropshipping plugin issues only. Support can take place through [Knawat support portal](https://help.knawat.com/hc/en-us/requests/new/) which is available for free.
 
 Support requests in issues on this repository will be closed on sight.
 
 ## Contributing to Knawat
-If you have a patch or have stumbled upon an issue with Knawat WooCommerce plugin core, you can contribute this back to the code. Please make a pull request.
+If you have a patch or have stumbled upon an issue with Knawat WooCommerce plugin core, you can contribute this back to the code. Please create a pull request.
 
+## Check also
+* [Knawat RESTful API](https://mp.knawat.io)
+* [Magento 2 Module](https://github.com/Knawat/knawat-dropshipping-magento2)
+* [OpenCart Module](https://github.com/Knawat/knawat-dropshipping-opencart)
