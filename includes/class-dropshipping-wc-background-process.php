@@ -83,9 +83,12 @@ class Knawat_Dropshipping_WC_Background extends WP_Background_Process {
 			$item['failed']   += count( $results['failed'] );
 			$item['updated']  += count( $results['updated'] );
 
-			// update option on import finish.
-			update_option( 'knawat_full_import', 'done', false );
-			update_option( 'knawat_last_imported', time(), false );
+			if( !isset( $params['force_stopped'] ) ){
+				// update option on import finish.
+				update_option( 'knawat_full_import', 'done', false );
+				update_option( 'knawat_last_imported', time(), false );
+			}
+
 			// Logs import data
 			knawat_dropshipwc_logger( '[IMPORT_STATS_FINAL]'.print_r( $item, true ), 'info' );
 			knawat_dropshipwc_logger( '[FAILED_IMPORTS]'.print_r( $error_log, true ) );
