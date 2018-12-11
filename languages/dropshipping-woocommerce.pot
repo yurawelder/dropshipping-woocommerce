@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the Knawat WooCommerce DropShipping package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Knawat WooCommerce DropShipping 2.0.0\n"
+"Project-Id-Version: Knawat WooCommerce DropShipping 2.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dropshipping-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-09-27 11:50:24+00:00\n"
+"POT-Creation-Date: 2018-12-11 06:19:18+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,15 +36,19 @@ msgstr ""
 msgid "Order synchronize fail. order id: #%d"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:344
+#: includes/class-dropshipping-wc-mp-orders.php:258
+msgid "(Knawat Payment Method)"
+msgstr ""
+
+#: includes/class-dropshipping-wc-mp-orders.php:347
 msgid "Some orders are not sycronized with knawat.com. Please"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:345
+#: includes/class-dropshipping-wc-mp-orders.php:348
 msgid "synchronize it now"
 msgstr ""
 
-#: includes/class-dropshipping-wc-mp-orders.php:391
+#: includes/class-dropshipping-wc-mp-orders.php:394
 msgid "Nonce failed. Please try again."
 msgstr ""
 
@@ -222,16 +226,21 @@ msgid ""
 "product, then delete it permanently."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-importer.php:106
+#: includes/class-dropshipping-woocommerce-importer.php:112
 msgid "Please provide product sku."
 msgstr ""
 
-#: includes/class-dropshipping-woocommerce-importer.php:122
-#: includes/class-dropshipping-woocommerce-importer.php:132
-#: includes/class-dropshipping-woocommerce-importer.php:222
+#: includes/class-dropshipping-woocommerce-importer.php:128
+#: includes/class-dropshipping-woocommerce-importer.php:138
+#: includes/class-dropshipping-woocommerce-importer.php:244
 msgid ""
 "Something went wrong during get data from Knawat MP API. Please try again "
 "later."
+msgstr ""
+
+#: includes/class-dropshipping-woocommerce-importer.php:464
+msgid ""
+"Variation cannot be imported: Missing parent ID or parent does not exist yet."
 msgstr ""
 
 #: includes/class-dropshipping-woocommerce-orders.php:299
@@ -1132,9 +1141,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.0)  #-#-#-#-#
+#. #-#-#-#-#  dropshipping-woocommerce.pot (Knawat WooCommerce DropShipping 2.0.1)  #-#-#-#-#
 #. Description of the plugin/theme
 msgid "Knawat WooCommerce DropShipping"
 msgstr ""
