@@ -341,7 +341,7 @@ class Knawat_Dropshipping_Woocommerce_Importer extends WC_Product_Importer {
 						}
 					}
 					// continue if no attribute name found.
-					if( $attribute_name == '' ){
+					if( $attribute_name == '' || empty($attribute_options)){
 						continue;
 					}
 
